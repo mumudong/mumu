@@ -1,0 +1,27 @@
+摘要
+在学习使用Spark的过程中，总是想对内部运行过程作深入的了解，其中DEBUG和TRACE级别的日志可以为我们提供详细和有用的信息，那么如何进行合理设置呢，不复杂但也绝不是将一个INFO换为TRACE那么简单。
+
+主要问题
+调整Spark日志级别的配置文件是$SPARK_HOME/conf/log4j.properties，默认级别是INFO，如果曾经将其改为DEBUG的朋友可能会有这样的经历，有用的信息还没看完，就被大量的心跳检测日志给淹没了。
+
+解决办法
+只将需要的日志级别调整为TRACE，而将心跳检测类的设置为INFO级别以上，避免干扰。
+
+log4j.properties示范
+
+Set everything to be logged to the console log4j.rootCategory=INFO, console 
+log4j.appender.console=org.apache.log4j.ConsoleAppender 
+log4j.appender.console.target=System.err 
+log4j.appender.console.layout=org.apache.log4j.PatternLayout 
+log4j.appender.console.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n 
+# Settings to quiet third party logs that are too verbose 
+log4j.logger.org.eclipse.jetty=WARN 
+log4j.logger.org.eclipse.jetty.util.component.AbstractLifeCycle=ERROR 
+log4j.logger.org.apache.spark.repl.SparkIMain$exprTyper=INFO 
+log4j.logger.org.apache.spark.repl.SparkILoop$SparkILoopInterpreter=INFO 
+log4j.logger.org.apache.spark.sql.SQLContext=TRACE 
+log4j.logger.org.apache.spark.sql.catalyst.analysis.Analyzer=TRACE 
+log4j.logger.org.apache.spark=TRACE 
+log4j.logger.org.apache.spark.storage.BlockManagerMasterActor=WARN 
+log4j.logger.org.apache.spark.HeartbeatReceiver=WARN 
+log4j.logger.org.apache.spark.scheduler.local.LocalActor=WARN

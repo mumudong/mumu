@@ -1,0 +1,302 @@
+ALTER TABLE foo 
+    SET FILEFORMAT 
+        INPUTFORMAT "com.hadoop.mapred.DeprecatedLzoTextInputFormat" 
+        OUTPUTFORMAT "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutpu
+		
+#!/bin/bash
+
+10.167.222.119:22
+
+--color=[true/false]
+set mapreduce.job.queuename=queueName
+
+
+beeline -u jdbc:hive2://10.167.222.113:10000  -n tx_etl -p tx_etl  
+
+
+
+数据源（到ip），我们可以直接访问吗？是否需要开通权限
+要pdm文档（表结构，字段含义）
+
+
+
+
+
+Option Explicit  
+  
+Dim mdl ' the current model  
+Set mdl = ActiveModel  
+If (mdl Is Nothing) Then  
+   MsgBox "There is no Active Model"  
+End If  
+  
+Dim HaveExcel  
+Dim RQ  
+RQ = vbYes 'MsgBox("Is Excel Installed on your machine ?", vbYesNo + vbInformation, "Confirmation")  
+If RQ = vbYes Then  
+   HaveExcel = True  
+   ' Open & Create Excel Document  
+   Dim x1  '  
+   Set x1 = CreateObject("Excel.Application")  
+   x1.Workbooks.Open "C:\Users\Administrator\Desktop\123.xls"   '指定excel文档路径  
+   x1.Workbooks(1).Worksheets("Sheet1").Activate   '指定要打开的sheet名称  
+Else  
+   HaveExcel = False  
+End If  
+
+a x1, mdl  
+
+sub a(x1, mdl)  
+dim rwIndex     
+dim tableName  
+dim colname  
+dim table  
+dim col  
+dim count  
+
+on error Resume Next  
+  
+set table = mdl.Tables.CreateNew '创建一个表实体  
+
+With x1.Workbooks(1).Worksheets("Sheet1")
+
+	table.Name = .Cells(1, 6).Value   '指定表名，如果在Excel文档里有，也可以 .Cells(rwIndex, 3).Value 这样指定  
+	table.Code = .Cells(1, 6).Value  '指定表名  
+End With
+count = count + 1  
+  
+For rwIndex = 2 To 1000   '指定要遍历的Excel行标  由于第1行是表头，从第2行开始  
+        With x1.Workbooks(1).Worksheets("Sheet1")  
+            If .Cells(rwIndex, 1).Value = "" Then  
+               Exit For  
+            End If  
+  
+               set col = table.Columns.CreateNew   '创建一列/字段  
+               'MsgBox .Cells(rwIndex, 1).Value, vbOK + vbInformation, "列"  
+               If .Cells(rwIndex, 3).Value = "" Then  
+                  col.Name = .Cells(rwIndex, 1).Value   '指定列名  
+               Else   
+                  col.Name = .Cells(rwIndex, 3).Value  
+               End If  
+               'MsgBox col.Name, vbOK + vbInformation, "列"  
+               col.Code = .Cells(rwIndex, 1).Value   '指定列名  
+                 
+               col.DataType = .Cells(rwIndex, 2).Value   '指定列数据类型  
+                 
+               col.Comment = .Cells(rwIndex, 5).Value  '指定列说明  
+                 
+               If .Cells(rwIndex, 4).Value = "否" Then  
+                   col.Mandatory = true        '指定列是否可空  true  为不可空                    
+               End If  
+                 
+               If rwIndex = 2 Then  
+                   col.Primary = true    '指定主键  
+               End If  
+        End With  
+Next  
+MsgBox "生成数据表结构共计 " + CStr(count), vbOK + vbInformation, "表"  
+  
+Exit Sub  
+End sub
+
+
+===========
+=================
+'****************************************************************************** '*   File:           name2comment.vbs '*   Purpose:     Database   generation   cannot   use   object   names   anymore   '                         in   version   7   and   above. '                         It   always   uses   the   object   codes. ''                         In   case   the   object   codes   are   not   aligned   with   your   '                         object   names   in   your   model,   this   script   will   copy   '                         the   object   Name   onto   the   object   Comment   for   '                         the   Tables   and   Columns. ''*   Title:         '*   Version:     1.0 '*   Company:     Sybase   Inc.   '******************************************************************************
+Option ExplicitValidationMode   = TrueInteractiveMode   =   im_Batch
+Dim   mdl   '   the   current   model
+'   get   the   current   active   model Set   mdl   =   ActiveModel If   (mdl   Is Nothing)   ThenMsgBox "There   is   no   current   Model "ElseIf Not   mdl.IsKindOf(PdPDM.cls_Model)   ThenMsgBox "The   current   model   is   not   an   Physical   Data   model. "Else      ProcessFolder   mdl End If
+'   This   routine   copy   name   into   comment   for   each   table,   each   column   and   each   view '   of   the   current   folder Private sub   ProcessFolder(folder) Dim   Tab   'running     table for each   Tab   in   folder.tables if not   tab.isShortcut   then                  '把表明作为表注释，其实不用这么做                  tab.comment   =   tab.name Dim   col   '   running   column for each   col   in   tab.columns                         '把列name和comment合并为comment                        col.comment=   col.name nextend ifnext
+Dim   view   'running   view for each   view   in   folder.Views if not   view.isShortcut   then                  view.comment   =   view.name end ifnext
+'   go   into   the   sub-packages Dim   f   '   running   folder For Each   f   In   folder.Packages if not   f.IsShortcut   then                  ProcessFolder   f end ifNextend sub
+==================================
+
+Hive从0.14开始，使用Zookeeper实现了HiveServer2的HA功能（ZooKeeperService Discovery），Client端可以通过指定一个nameSpace来连接HiveServer2，而不是指定某一个host和port。
+hive-site.xml配置
+<property>
+<name>hive.server2.support.dynamic.service.discovery</name>
+<value>true</value>
+</property>
+ 
+<property>
+<name>hive.server2.zookeeper.namespace</name>
+<value>hiveserver2_zk</value>
+</property>
+ 
+<property>
+<name>hive.zookeeper.quorum</name>
+<value>zkNode1:2181,zkNode2:2181,zkNode3:2181</value>
+</property>
+ 
+<property>
+<name>hive.zookeeper.client.port</name>
+<value>2181</value>
+</property>
+ 
+<property>
+<name>hive.server2.thrift.bind.host</name>
+<value>0.0.0.0</value>
+</property>
+ 
+<property>
+<name>hive.server2.thrift.port</name>
+<value>10001</value> //两个HiveServer2实例的端口号要一致
+</property>
+ 
+Hiveserver2启动
+nohup hive --service hiveserver2 --hiveconf  hive.server2.thrift.port=10001 --hiveconf hive.metastore.uris='thrift://192.168.10.34:9083,thrift://192.168.10.35:9084' --hiveconf hive.server2.zookeeper.namespace=hiveserver2/ssjf --hiveconf hive.log.dir=/hive/logs/server2_10001 --hiveconf hive.exec.scratchdir=/user/ssjf/tmpdata &
+其中：
+指定端口:10001 
+指定metastore的uri：thrift://192.168.10.34:9083,thrift://192.168.10.35:9084，
+指定server2的轮询分组命名空间:hiveserver2/ssjf 
+指定日志目录:/hive/logs/server2_10001
+指定临时文件目录:/user/ssjf/tmpdata
+JDBC连接
+JDBC连接的URL格式为：
+jdbc:hive2://<zookeeper quorum>/<dbName>;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2
+其中：
+<zookeeper quorum> 为Zookeeper的集群链接串，如zkNode1:2181,zkNode2:2181,zkNode3:2181
+<dbName> 为Hive数据库，默认为default
+serviceDiscoveryMode=zooKeeper 指定模式为zooKeeper
+zooKeeperNamespace=hiveserver2 指定ZK中的nameSpace，即参数hive.server2.zookeeper.namespace所定义，我定义为hiveserver2_zk
+ 
+连接hiveserver2
+客户端轮询方式连接
+beeline -u "jdbc:hive2://jfhadoop005:9501,jfhadoop006:9501,jfhadoop007:9501/ssjf;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2/ssjf;?mapreduce.job.queuename=root.ssfj" -n ssjf -pXXXX -d org.apache.hive.jdbc.HiveDriver
+其中：
+ -u   
+   jfhadoop005:9501  三个zk的9501端口，轮询用
+   ssjf   租户对应的hiveserver库
+   serviceDiscoveryMode=zooKeeper;   zk轮询发现hs2
+   zooKeeperNamespace=hiveserver2/ssjf  轮询的命名空间，指定轮询服务器的范围  和 hiveserver2的轮询分组命名空间对应。
+   ?mapreduce.job.queuename=root.ssfj 对照的yarn资源分组队列
+-n   多租户用户名
+-p   多租户用户密码
+-d  org.apache.hive.jdbc.HiveDriver hive连接驱动
+客户端直连方式连接
+beeline -u "jdbc:hive2://192.168.10.32:10000/sjzx" -n  sjzx-p  XXXX  -d org.apache.hive.jdbc.HiveDriver 
+其中：
+hs2地址和端口：192.168.10.32:10000
+sjzx   租户对应的hiveserver库
+-n   多租户用户名
+-p   多租户用户密码
+-d  org.apache.hive.jdbc.HiveDriver hive连接驱动
+
+-===================================
+======================================
+电影属性： ID         主键
+		   name
+           Array[struct](多个主演：演员ID，演员name)
+		   Array (类型：["剧情","爱情","武打")
+
+
+数据文件
+     123456|霸王别姬|1003494$张国荣^1050265$张丰毅^1035641$巩俐^1000905$葛优^1011479$英达|剧情^爱情^武打
+
+定义表结构
+CREATE  TABLE film(
+doubanid         bigint,
+title            string,
+starring         array<struct<id:bigint,name:string>>,
+genre            array<string>)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+COLLECTION ITEMS TERMINATED BY '^'
+MAP KEYS TERMINATED BY '$';
+
+
+加载数据
+load data local inpath '/opt/film.txt' overwrite into table film;
+查询 array 数据类型字段的长度
+select name,size(worklocations) from users;
+查询 array 数据类型字段指定列的一行数据
+select *from users where array_contains(worklocations,'beijing');
+
+create table actor(
+id int,
+name string
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\001' ;
+
+create table film0(
+id int ,
+name string,
+actor_id array
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\001' 
+COLLECTION ITEMS TERMINATED BY '^';
+
+
+
+
+CREATE  TABLE film2(
+doubanid         bigint,
+title            string,
+starring         array<struct<id:bigint,name:array<string>>>,
+genre            array<string>)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+COLLECTION ITEMS TERMINATED BY '^'
+MAP KEYS TERMINATED BY '$';
+
+
+=====================
+udaf
+
+add jar /opt/demo-hive-0.0.1-SNAPSHOT.jar;
+create temporary function aggreg as 'com.tx.demo_hive.UDAF_JSON';
+create temporary function aggreg2 as 'com.tx.demo_hive.GenericUDAFDedup';
+
+set mapred.job.name='test_agg';
+select aggreg(id,name) from user1;
+
+
+ 
+
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>2.3</version>
+            <configuration>
+                <filters>
+                    <filter>
+                        <artifact>*:*</artifact>
+                        <excludes>
+                            <exclude>META-INF/*.SF</exclude>
+                            <exclude>META-INF/*.DSA</exclude>
+                            <exclude>META-INF/*.RSA</exclude>
+                        </excludes>
+                    </filter>
+                </filters>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
+
+
+
+
+
+	
+
+
+
+
+ 
+
+select a.DICT_HOUSE_TYPE,a.DICT_HOUSE_TYPE_REMARK from t_loan_house a limit 10;
+
+
+select * from t_gl_dict where label like '%公积金按揭购房%';
+
+
+
+
+
+
+

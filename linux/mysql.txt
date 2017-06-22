@@ -1,0 +1,2 @@
+CREATE USER 'kettle'@'%' IDENTIFIED BY 'kettle'; 
+GRANT all privileges ON *.* TO 'kettle'@'%' ;

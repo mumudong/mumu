@@ -1,0 +1,57 @@
+#!/bin/bash 
+#导入到hdfs 
+#table_name=表名 
+#-z 开启压缩，GZip 
+#--compression-codec org.apache.hadoop.io.compress.BZip2Codec BZip格式 
+databaseip=(`awk -F '|' '{print $1}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+databaseport=(`awk -F '|' '{print $2}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+databasetable=(`awk -F '|' '{print $3}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+databaseuser=(`awk -F '|' '{print $4}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+databasepwd=(`awk -F '|' '{print $5}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+database_model=(`awk -F '|' '{print $6}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+
+
+prefix="t_" 
+out_table_name="" 
+PRONUM=10               #进程个数  
+  
+tmpfile="$$.fifo"        #临时生成管道文件  
+mkfifo $tmpfile  
+exec 6<>$tmpfile  
+rm $tmpfile  
+  
+for(( i=0; i<$PRONUM; i++ ))  
+do  
+        echo "init."  
+done >&6  
+ 
+while read line   
+do   
+    read -u6
+        {       table_name="$line"
+                if [[ "$table_name" == $prefix* ]] 
+                then 
+                out_table_name=$table_name 
+                else 
+                out_table_name=$prefix$table_name 
+                fi 
+                
+                
+sqoop import \
+--connect jdbc:srdbsql://${databaseip[0]}:${databaseport[0]}/${databasetable[0]} \
+--driver org.srdbsql.Driver \
+--username ${databaseuser[0]} \
+--password ${databasepwd[0]} \
+--query "select * from $database_model.$table_name where \$CONDITIONS" \
+-z \
+--null-string '' --null-non-string '' \
+--delete-target-dir --target-dir /ods/srdb/jk/$out_table_name \
+--fields-terminated-by '\001' -m 1 
+                if [ $? -ne 0 ] 
+                then 
+                echo $table_name >> /txdb/ods/offline/sqoop/srdb/jk/impl/BUG_table 
+                fi   
+                echo    >& 6
+                echo "$table_name finished"
+        }  &  
+done  < /txdb/ods/offline/sqoop/srdb/test

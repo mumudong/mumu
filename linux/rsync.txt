@@ -1,0 +1,54 @@
+1，服务端
+vi /etc/rsyncd.conf 内容如下：
+
+#uid和gid指明了运行身份
+uid = nobody 
+gid = nobody 
+
+use chroot = yes 
+#chroot表示连接后自动切换目录
+max connections = 4 
+pid file = /var/run/rsyncd.pid 
+lock file = /var/run/rsync.lock 
+log file = /var/log/rsyncd.log 
+
+[downloads] 
+path = /www/downloads/ 
+ignore errors 
+read only = false 
+#read only=false是允许别的客户端向本机的服务器端上传
+list = false 
+hosts allow = 192.168.131.113/24 
+hosts deny = 0.0.0.0/32 
+auth users = backup 
+secrets file = /etc/rsyncd.pwd
+
+2,接下来编辑密码文件：
+vi /etc/rsyncd.pwd 
+backup:123456 
+
+#设置密码文件权限700：（权限不对会登陆不上）
+chmod 700 /etc/rsyncd.pwd 
+#然后启动rsync服务：
+/usr/bin/rsync --daemon 
+#把rsync加入自动启动脚本，开机后自动启动：
+echo "/usr/bin/rsync --daemon" >> /etc/rc.d/rc.local 
+#注意一下iptables必须允许rsync的873端口被连接。
+
+客户端创建密码文件
+vim /root/rsync.pwd
+123456
+
+
+将本地文件同步至服务器
+rsync [-参数] 源地址路径 目标地址路径 
+rsync -vrtL --progress \ /www/test/* \ backup@192.168.131.114::downloads \ --password-file=/root/rsync.pwd
+
+
+从服务器上面同步过来
+rsync -avzP root@192.168.131.114::downloads /test --password-file=/root/rsync.pwd
+
+
+
+
+

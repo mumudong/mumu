@@ -1,0 +1,85 @@
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+	<!-- PLEASE set to values appropriate for YOUR environment -->
+	<!-- example properties for your reference -->
+	<property name="LOG_DIR" value="logs/example"/>
+	<property name="MAX_HISTORY_MAIN_LOG" value="10"/>
+	<property name="MAX_SIZE_MAIN_LOG" value="100MB"/>
+	<property name="MAX_HISTORY_FAILED_LOG" value="5"/>
+	<property name="MAX_SIZE_FAILED_LOG" value="100MB"/>
+	<property name="log_pattern" value="%d{MM-dd-HH:mm:ss} [%thread] %p %logger{36}:%L %msg%n" />
+	<!-- end of example properties -->
+
+	<appender name="STDOUT"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${log_pattern}</pattern>
+		</encoder>
+	</appender>
+
+    <appender name="MAIN_LOGS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/kafka_indexer.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_DIR}/kafka_indexer-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <!-- keep ${MAX_HISTORY_MAIN_LOG} days' worth of history -->
+            <maxHistory>${MAX_HISTORY_MAIN_LOG}</maxHistory>
+            <!-- or whenever the file size reaches ${MAX_SIZE_MAIN_LOG} -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${MAX_SIZE_MAIN_LOG}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+	        <pattern>${log_pattern}</pattern>
+        </encoder>
+    </appender>
+
+	<appender name="FAILED_EVENTS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_DIR}/failed_events.log</file>
+        <append>true</append>
+	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	      <!-- rollover daily -->
+	      <fileNamePattern>${LOG_DIR}/failed_events-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+	      <maxHistory>${MAX_HISTORY_FAILED_LOG}</maxHistory> 
+	      <timeBasedFileNamingAndTriggeringPolicy
+	            class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+	        <!-- or whenever the file size reaches max size -->
+	        <maxFileSize>${MAX_SIZE_FAILED_LOG}</maxFileSize>
+	      </timeBasedFileNamingAndTriggeringPolicy>
+	    </rollingPolicy>
+        <encoder>
+			<pattern>${log_pattern}</pattern>
+        </encoder>
+	</appender>
+
+	<!-- 全部日志 -->
+	<appender name="all" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_DIR}/all.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_DIR}/all-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches 100MB -->
+				<maxFileSize>${MAX_SIZE_MAIN_LOG}</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<maxHistory>${MAX_HISTORY_MAIN_LOG}</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${log_pattern}</pattern>
+		</encoder>
+	</appender>
+
+
+    <logger name="org.yc.kafka.indexer.FailedEventsLogger" level="error" additivity="false">
+        <appender-ref ref="FAILED_EVENTS" />
+    </logger>
+
+   <logger name="org.yc.kafka" level="info" additivity="false">
+     <appender-ref ref="MAIN_LOGS" />
+   </logger>
+
+	<root level="INFO">
+		<appender-ref ref="all"/>
+		<!-- <appender-ref ref="STDOUT"/> -->
+	</root>
+</configuration>

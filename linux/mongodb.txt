@@ -1,0 +1,13 @@
+
+mongodb开机服务
+mongod.exe --bind_ip yourIPadress --logpath "E:\home\mongodb\mongodb.log" --logappend ^
+--dbpath "E:\home\mongodb" --port 20000 --serviceName "mu_mongodb" ^
+--serviceDisplayName "mu_mongodb" --install
+然后：net start mu_mongodb
+
+或者直接启动：mongod.exe  --dbpath E:\home\mongodb --port 22222
+
+
+select * from t_gl_dict where label like '%征信%';
+
+mongod.exe --bind_ip yourIPadress --logpath "E:\home\mongodb\mongodb.log" --logappend --dbpath "E:\home\mongodb" --port 20000 --serviceName "mu_mongodb" --serviceDisplayName "mu_mongodb" --install

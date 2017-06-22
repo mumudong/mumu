@@ -1,0 +1,187 @@
+1.按一定的规则编写服务脚本，比如：myserviced
+
+[plain] view plain copy print?
+#!/bin/sh  
+#chkconfig: 2345 80 05   
+#description: myservice   
+  
+case $1 in  
+start)  
+    echo "myservice startup" #将该行替换成你自己的服务启动命令  
+    ;;  
+stop)  
+    echo "myservice stop" #将该行替换成你自己服务的启动命令  
+    ;;  
+restart)  
+    echo "myservice stop" #...  
+    echo "myservice startup" #...  
+    ;;  
+*)  
+    ;;  
+esac  
+命令解析：
+# chkconfig: 2345 80 5
+2345表示服务的运行级别，80代表Start的顺序，05代表Kill（Stop）的顺序；
+# description: service_description
+该服务的描述
+
+2.将编写的脚本放到/etc/init.d/，将myserviced的访问权限加上“可执行”
+[plain] view plain copy print?
+chmod +x myserviced  
+
+3.增加服务
+[plain] view plain copy print?
+chkconfig --add myserviced  
+
+4.启停服务
+[plain] view plain copy print?
+service myserviced start  
+service myserviced stop  
+
+服务添加完成
+可以用：chkconfig --list查看当前系统的服务
+可以用：chkconfig --del myserviced删除服务
+
+======================
+====================
+你写的每个脚本都应该在文件开头加上set -e,这句语句告诉bash如果任何语句的执行结果不是true则应该退出。这样的好处是防止错误像滚雪球般变大导致一个致命的错误，而这些错误本应该在之前就被处理掉。如果要增加可读性，可以使用set -o errexit，它的作用与set -e相同。
+
+exec 3<>test.sh;
+#打开test.sh可读写操作，与文件描述符3绑定
+ 
+while read line<&3
+ do
+    echo $line;
+done
+#循环读取文件描述符3（读取的是test.sh内容）
+exec 3>&-
+exec 3<&-
+#关闭文件的，输入，输出绑定
+
+
+exec 6>&1
+#将标准输出与fd 6绑定
+[chengmo@centos5
+ shell]$ ls  /proc/self/fd/ 
+0  1  2  3  6
+#出现文件描述符6
+[chengmo@centos5
+ shell]$ exec 1>suc.txt
+#将接下来所有命令标准输出，绑定到suc.txt文件（输出到该文件）
+[chengmo@centos5
+ shell]$ ls -al
+#执行命令，发现什么都不返回了，因为标准输出已经输出到suc.txt文件了
+[chengmo@centos5
+ shell]$ exec 1>&6
+#恢复标准输出
+[chengmo@centos5
+ shell]$ exec 6>&-
+#关闭fd
+ 6描述符
+[chengmo@centos5
+ ~]$ ls /proc/self/fd/
+0  1  2  3
+
+
+--------------------------------
+-------------------------------------
+#!bin/bash  
+  
+PRONUM=10               #进程个数  
+  
+tmpfile="$$.fifo"        #临时生成管道文件  
+mkfifo $tmpfile  
+exec 6<>$tmpfile  
+rm $tmpfile  
+  
+for(( i=0; i<$PRONUM; i++ ))  
+do  
+        echo "init."  
+done >&6  
+  
+while read line   
+do   
+    read -u6
+        {       table_name="$line"
+                if [[ "$table_name" == $prefix* ]] 
+                then 
+                out_table_name=$table_name 
+                else 
+                out_table_name=$prefix$table_name 
+                fi 
+                
+                
+                sqoop import \ 
+                --connect jdbc:srdbsql://${databaseip[0]}:${databaseport[0]}/${databasetable[0]} \ 
+                --driver org.srdbsql.Driver \ 
+                --username ${databaseuser[0]} \ 
+                --password ${databasepwd[0]} \ 
+                --query "select \ 
+                * \ 
+                from $database_model.$table_name where \$CONDITIONS" \ 
+                -z \ 
+                --null-string '' --null-non-string '' \ 
+                --delete-target-dir --target-dir /ods/srdb/jk/$out_table_name \ 
+                --fields-terminated-by '\001' -m 1 
+                if [ $? -ne 0 ] 
+                then 
+                echo $table_name >> /txdb/ods/offline/sqoop/srdb/jk/impl/BUG_table 
+                fi   
+                echo    >& 6
+				echo "$table_name finished"
+        }  &  
+done  < /txdb/ods/offline/sqoop/srdb/jk_table_list 
+
+----------------------------------
+------------------------------
+#!/bin/bash 
+#导入到hdfs 
+#table_name=表名 
+#-z 开启压缩，GZip 
+#--compression-codec org.apache.hadoop.io.compress.BZip2Codec BZip格式 
+databaseip=(`awk -F '|' '{print $1}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+databaseport=(`awk -F '|' '{print $2}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+databasetable=(`awk -F '|' '{print $3}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+databaseuser=(`awk -F '|' '{print $4}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+databasepwd=(`awk -F '|' '{print $5}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+database_model=(`awk -F '|' '{print $6}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`) 
+
+
+prefix="t_" 
+out_table_name="" 
+
+
+for table_name in `cat /txdb/ods/offline/sqoop/srdb/jk_table_list` 
+do 
+{ 
+
+if [[ "$table_name" == $prefix* ]] 
+then 
+out_table_name=$table_name 
+else 
+out_table_name=$prefix$table_name 
+fi 
+
+
+sqoop import \ 
+--connect jdbc:srdbsql://${databaseip[0]}:${databaseport[0]}/${databasetable[0]} \ 
+--driver org.srdbsql.Driver \ 
+--username ${databaseuser[0]} \ 
+--password ${databasepwd[0]} \ 
+--query "select \ 
+* \ 
+from $database_model.$table_name where \$CONDITIONS" \ 
+-z \ 
+--null-string '' --null-non-string '' \ 
+--delete-target-dir --target-dir /ods/srdb/jk/$out_table_name \ 
+--fields-terminated-by '\001' -m 1 
+if [ $? -ne 0 ] 
+then 
+echo $table_name >> /txdb/ods/offline/sqoop/srdb/jk/impl/BUG_table 
+fi 
+}& 
+done{split}
+
+
+
+
