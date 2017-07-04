@@ -1,0 +1,6 @@
+spark.streaming.backpressure.enabled  反压机制
+
+
+zookeeper.session.timeout.ms=6000,客户端连接超过6s超时
+
+spark.cleaner.ttl  spark元数据超时时间，长期运行，元数据影像性能

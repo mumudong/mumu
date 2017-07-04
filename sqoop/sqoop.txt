@@ -17,7 +17,7 @@ PRONUM=10               #进程个数
   
 tmpfile="$$.fifo"        #临时生成管道文件  
 mkfifo $tmpfile  
-exec 6<>$tmpfile  
+exec 6<>$tmpfile    #绑定管道至文件描述符6
 rm $tmpfile  
   
 for(( i=0; i<$PRONUM; i++ ))  
@@ -31,7 +31,7 @@ do
         {       table_name="$line"
                 if [[ "$table_name" == $prefix* ]] 
                 then 
-                out_table_name=$table_name 
+                out_table_name=$table_name         
                 else 
                 out_table_name=$prefix$table_name 
                 fi 
@@ -51,7 +51,7 @@ sqoop import \
                 then 
                 echo $table_name >> /txdb/ods/offline/sqoop/srdb/jk/impl/BUG_table 
                 fi   
-                echo    >& 6
+                echo    >  &6  # &6表示6通道，> &6输出传递给6通道，> 6值传递给6文件
                 echo "$table_name finished"
         }  &  
 done  < /txdb/ods/offline/sqoop/srdb/test

@@ -1,0 +1,14 @@
+curl
+在Linux中curl是一个利用URL规则在命令行下工作的文件传输工具，可以说是一款很强大的http命令行工具。
+它支持文件的上传和下载，是综合传输工具，但按传统，习惯称url为下载工具。
+
+sdkman是一个软件开发工具箱管理工具 Software Development Kit Manager
+安装步骤:
+	1: curl -s "https://get.sdkman.io" | bash   (下载结束会有提示信息的！)
+	2: source "$HOME/.sdkman/bin/sdkman-init.sh"
+	3: sdk version   (有版本信息说明安装成功了！)
+	
+gradle是类似maven的工具，管理项目，提高开发效率，编译程序
+安装步骤:
+	1: sdk install gradle 4.0
+	
