@@ -1,0 +1,62 @@
+
+
+1，Repeated Read
+
+在可重复读(REPEATABLE READS)隔离级别中，基于锁机制并发控制的DBMS需要对选定对象的读锁(read locks)和写锁(write locks)一直保持到事务结束，但不要求“范围锁(range-locks)”，因此可能会发生“幻影读(phantom reads)”
+
+在该事务级别下，保证同一个事务从开始到结束获取到的数据一致。这是Mysql的默认事务级别。
+
+设置我们的数据库事务为该级别。
+
+SET  SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;SET  GLOBAL TRANSACTION ISOLATION LEVEL  REPEATABLE READ;
+
+2，场景
+
+开启事务1，在我们数据库中对student表修改，事务不提交。
+
+start TRANSACTION;
+ select * from student;
+ update student set name = 'a2' where id = 1;
+ select * from student;
+
+开启事务2，查询student表数据，事务不提交
+
+start TRANSACTION;select * from student;
+
+提交事务1。
+
+start TRANSACTION;
+ select * from student;
+ update student set name = 'a2' where id = 1;
+ select * from student;
+ COMMIT;
+
+事务2中继续查询。
+
+查询，发现未获取到事务1的数据。
+
+此事务级别保证了同一个事务获取数据一致。
+
+
+
+
+
+
+
+
+
+
+
+查看链接进程
+information_schema.processlist;
+查出来kill命令杀掉
+show status
+show vaviarables like '%connections%';
+
+
+
+
+
+
+
+

@@ -1,0 +1,14 @@
+1, show status命令了解各种sql执行频率
+   show [session|global] status查看服务器状态信息，或mysqladmin extended-status
+   默认显示session级别
+   show status like 'Com_%';了解输入为主还是
+      com_xxx表示xxx语句执行的次数，如select，update等
+   下面的针对innodb引擎
+      innnodb_rows_read:select查询返回的行数
+      innodb_rows_inserted:insert插入的行数
+   2，通过启动时添加--log-slow-queries=filename，mysqld将会把执行时间超过long_query_time秒的sql语句写入日志
+      show processlist命令可查看当前进行的线程，可查看线程状态，是否锁表等。
+3，explain分析低效sql的执行计划
+ 
+ 
+ 
