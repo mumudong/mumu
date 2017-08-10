@@ -1,0 +1,141 @@
+一,配置history server
+
+1.配置history server,在etc/Hadoop/mapred-site.xml中配置以下内容.
+
+[html] view plain copy 在CODE上查看代码片派生到我的代码片
+<span style="font-size:18px;"><span style="font-size:18px;">  <property>  
+    <name>mapreduce.jobhistory.address</name>  
+     <value>localhost:10020</value>  
+  </property>  
+  <property>  
+    <name>mapreduce.jobhistory.webapp.address</name>  
+    <value>localhost:19888</value>  
+  </property></span></span>  
+2.把配置分发到所有服务器
+
+3.启动服务,以localhost这台服务器上执行以下语句:
+
+mr-jobhistory-daemon.sh  start historyserver
+
+
+
+
+
+二 ,配置timeline server
+
+1.配置history server,在etc/hadoop/yarn-site.xml中配置以下内容.
+
+[html] view plain copy 在CODE上查看代码片派生到我的代码片
+<span style="font-size:18px;"><!--start timeline settings -->  
+  <property>  
+      <description></description>  
+    <name>yarn.timeline-service.hostname</name>  
+    <value>localhost</value>  
+  </property>  
+  <property>  
+  <description>Address for the Timeline server to start the RPC server.</description>  
+  <name>yarn.timeline-service.address</name>  
+  <value>${yarn.timeline-service.hostname}:10200</value>  
+</property>  
+  
+<property>  
+  <description>The http address of the Timeline service web application.</description>  
+  <name>yarn.timeline-service.webapp.address</name>  
+  <value>${yarn.timeline-service.hostname}:8188</value>  
+</property>  
+  
+<property>  
+  <description>The https address of the Timeline service web application.</description>  
+  <name>yarn.timeline-service.webapp.https.address</name>  
+  <value>${yarn.timeline-service.hostname}:8190</value>  
+</property>  
+  
+<property>  
+  <description>Handler thread count to serve the client RPC requests.</description>  
+  <name>yarn.timeline-service.handler-thread-count</name>  
+  <value>10</value>  
+</property>  
+  
+<property>  
+  <description>Enables cross-origin support (CORS) for web services where  
+  cross-origin web response headers are needed. For example, javascript making  
+  a web services request to the timeline server.</description>  
+  <name>yarn.timeline-service.http-cross-origin.enabled</name>  
+  <value>false</value>  
+</property>  
+  
+<property>  
+  <description>Comma separated list of origins that are allowed for web  
+  services needing cross-origin (CORS) support. Wildcards (*) and patterns  
+  allowed</description>  
+  <name>yarn.timeline-service.http-cross-origin.allowed-origins</name>  
+  <value>*</value>  
+</property>  
+  
+<property>  
+  <description>Comma separated list of methods that are allowed for web  
+  services needing cross-origin (CORS) support.</description>  
+  <name>yarn.timeline-service.http-cross-origin.allowed-methods</name>  
+  <value>GET,POST,HEAD</value>  
+</property>  
+  
+<property>  
+  <description>Comma separated list of headers that are allowed for web  
+  services needing cross-origin (CORS) support.</description>  
+  <name>yarn.timeline-service.http-cross-origin.allowed-headers</name>  
+  <value>X-Requested-With,Content-Type,Accept,Origin</value>  
+</property>  
+  
+<property>  
+  <description>The number of seconds a pre-flighted request can be cached  
+  for web services needing cross-origin (CORS) support.</description>  
+  <name>yarn.timeline-service.http-cross-origin.max-age</name>  
+  <value>1800</value>  
+</property>  
+<property>  
+  <description>Indicate to ResourceManager as well as clients whether  
+  history-service is enabled or not. If enabled, ResourceManager starts  
+  recording historical data that Timelien service can consume. Similarly,  
+  clients can redirect to the history service when applications  
+  finish if this is enabled.</description>  
+  <name>yarn.timeline-service.generic-application-history.enabled</name>  
+  <value>true</value>  
+</property>  
+  
+<property>  
+  <description>Store class name for history store, defaulting to file system  
+  store</description>  
+  <name>yarn.timeline-service.generic-application-history.store-class</name>  
+  <value>org.apache.hadoop.yarn.server.applicationhistoryservice.FileSystemApplicationHistoryStore</value>  
+</property>  
+<property>  
+  <description>Indicate to clients whether Timeline service is enabled or not.  
+  If enabled, the TimelineClient library used by end-users will post entities  
+  and events to the Timeline server.</description>  
+  <name>yarn.timeline-service.enabled</name>  
+  <value>true</value>  
+</property>  
+  
+<property>  
+  <description>Store class name for timeline store.</description>  
+  <name>yarn.timeline-service.store-class</name>  
+  <value>org.apache.hadoop.yarn.server.timeline.LeveldbTimelineStore</value>  
+</property>  
+  
+<property>  
+  <description>Enable age off of timeline store data.</description>  
+  <name>yarn.timeline-service.ttl-enable</name>  
+  <value>true</value>  
+</property>  
+  
+<property>  
+  <description>Time to live for timeline store data in milliseconds.</description>  
+  <name>yarn.timeline-service.ttl-ms</name>  
+  <value>6048000000</value>  
+</property>  
+  <!--end timeline settings --></span>  
+2.把配置分发到所有服务器
+
+3.启动服务,以localhost这台服务器上执行以下语句:
+
+yarn-daemon.sh start timelineserver
