@@ -1,0 +1,8 @@
+kafka-run-class.sh kafka.tools.ConsumerOffsetChecker
+#kafka查看topic各个分区的消息的信息
+kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group **  --topic ***  --zookeeper *:2181,*:2181,*:2181/kafka
+--zookeeper 那里是指kafka在zk中的path,即使zk有多个机器，如果在其中一台上执行此命令，显示连接不上，只写那台机器的地址端口+kafka的path即可
+指定自己的分组 自己消费的topic会显示kafka总共有多少数据，以及已经被消费了多少条
+结果：
+GROUP     TOPIC     PID       OFFSET             LOGSIZE   LAG
+消费者组  话题id    分区id    当前已消费的条数   总条数    未消费的条数
