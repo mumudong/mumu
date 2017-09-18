@@ -3,6 +3,36 @@ ALTER TABLE foo
         INPUTFORMAT "com.hadoop.mapred.DeprecatedLzoTextInputFormat" 
         OUTPUTFORMAT "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutpu
 		
+		
+ 1 进入mysql ，执行
+
+show create database hive 
+1
+1
+查看hive 数据库当前编码，如果是utf8 则执行下面sql
+alter database hive default character set latin1 
+1
+1
+将 hive 数据库默认编码改成 latin1
+
+2 执行下面sql ，修改表
+alter database hive default character set latin1 ;
+use hive; 
+alter table COLUMNS_V2 modify column COMMENT varchar(256) character set utf8;
+alter table TABLE_PARAMS modify column PARAM_VALUE varchar(4000) character set utf8;
+alter table PARTITION_PARAMS  modify column PARAM_VALUE varchar(4000) character set utf8;
+alter table PARTITION_KEYS  modify column PKEY_COMMENT varchar(4000) character set utf8;
+alter table  INDEX_PARAMS  modify column PARAM_VALUE  varchar(4000) character set utf8;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 #!/bin/bash
 
 10.167.222.119:22

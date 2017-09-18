@@ -1,0 +1,98 @@
+查看端口与进程对应关系   lsof -i:6001
+
+Docker有两个主要的部件：
+    Docker: 开源的容器虚拟化平台。
+    Docker Hub: 用于分享、管理Docker容器的Docker SaaS平台。
+Docker使用客户端-服务器(client-server)架构模式。Docker客户端会与Docker守护进程进行通信。
+Docker守护 进程会处理复杂繁重的任务，例如建立、运行、发布你的Docker容器。
+Docker客户端和守护进程可以运行在同一个系统上，当然你也可以使用 Docker客户端去
+连接一个远程的Docker守护进程。Docker客户端和守护进程之间通过socket或者RESTful API进行通信。
+
+
+要理解Docker的内部构建，必须知道以下三种部件：
+  Docker镜像 (Docker images)。
+  Docker仓库 (Docker registeries)。
+  Docker容器(Docker containers)。
+
+  Docker镜像是一个只读的模板
+  Docker仓库用来保存镜像。可以理解为代码控制中的代码仓库。同样的，Docker仓库也有公有和私有的概念。公有的Docker仓库名字是Docker Hub。Docker Hub提供了庞大的镜像集合供使用。这些镜像可以是你自己创建的，或者你也可以在别人的镜像基础上创建。Docker仓库是Docker的 分发 部分。
+  一个Docker容器包含了所有的某个应用运行所需要的环境。每一个Docker容器都是从Docker镜像创建 的。Docker容器可以运行、开始、停止、移动和删除。每一个Docker容器都是独立和安全的应用平台。Docker容器是Docker的 运行 部分。
+
+Docker镜像从这些基础的镜像创建，通过一种简单、具有描述性的步骤，我们称之为 指令(instructions)。
+每一个指令会在镜像中创建一个新的层，指令可以包含这些动作：
+    运行一个命令。
+    增加文件或者文件夹。
+    创建一个环境变量。
+    当运行容器的时候哪些程序会运行。
+这些指令存储在Dockerfile文件中。当你需要建立镜像的时候，Docker可以从Dockerfile中读取这些指令并且运行，然后返回一个最终的镜像。
+
+
+
+
+docker run
+    -a=[]          　　　 : Attach to `STDIN`, `STDOUT` and/or `STDERR`
+    -t=false        　　  : Allocate a pseudo-tty
+    --sig-proxy=true　    : Proxify all received signal to the process (non-TTY mode only) false就不能用ctrl D C退出了
+    -i=false        　　  : Keep STDIN open even if not attached
+    -d                    : 后台运行
+	--rm=false            : Automatically remove the container when it exits (incompatible with -d)
+	-m=""                 : Memory limit (format: <number><optional unit>, where unit = b, k, m or g)
+    -c=0                  : CPU shares (relative weight)  -c=0完全利用，=512则只能利用50%
+
+
+Docker支持的网络模式有：
+    none       ：关闭容器内的网络连接
+    bridge     ：通过veth接口来连接容器，默认配置。
+    host       ：允许容器使用host的网络堆栈信息。 注意：这种方式将允许容器访问host中类似D-BUS之类的系统服务，所以认为是不安全的。
+    container  ：使用另外一个容器的网络堆栈信息。
+比如当前有一个绑定了本地地址localhost的Redis容器。如果另外一个容器需要复用这个网络堆栈，则需要如下操作：
+$ sudo docker run -d --name redis example/redis --bind 127.0.0.1
+$ # use the redis container's network stack to access localhost
+$ sudo docker run --rm -ti --net container:redis example/redis-cli -h 127.0.0.1
+
+
+
+/etc/hosts文件中会包含容器的hostname信息，我们也可以使用--add-host这个参数来动态添加/etc/hosts中的数据。
+$ /docker run -ti --add-host db-static:86.75.30.9 ubuntu cat /etc/hosts
+
+127.0.0.1       localhost
+::1             localhost ip6-localhost ip6-loopback
+86.75.30.9      db-static、
+
+package docker:build 
+
+docker pull 10.167.202.170/hx-crawler/common-microservicehx-baidurss:0.0.1-SNAPSHOT
+
+docker run -itdP --net over 10.167.202.170/hx-crawler/common-microservicehx-baidurss:0.0.1-SNAPSHOT  
+
+查看容器运行
+docker ps
+docker logs dockerid
+
+停止容器   docker stop dockerid
+搜索镜像   docker search httpd
+
+删除镜像   docker rmi    docker rm
+
+
+进入docker   docker exec -it 4f6889c062ba /bin/sh
+             docker attach 44fc0f0582d9 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

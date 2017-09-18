@@ -1,0 +1,62 @@
+1. 初始化环境
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+[root@salt-node1 src]# vim /etc/sysctl.conf
+vm.max_map_count = 290000
+ 
+[root@salt-node1 src]#vim/etc/security/limits.conf 
+*        hard  nproc           20000
+*        soft  nproc           20000
+*        soft  nofile          290000
+*        hard  nofile          290000
+  
+[root@salt-node1 src]# cat /etc/security/limits.d/20-nproc.conf
+# Default limit for number of user's processes to prevent
+# accidental fork bombs.
+# See rhbz #432903 for reasoning.
+  
+*          soft    nproc    290000
+root       soft   nproc     unlimited
+  
+[root@salt-node1 src]# sysctl -p
+net.ipv4.ip_forward = 1
+vm.max_map_count = 290000
+[root@salt-node1 src]# su - java
+Last login: Sat Mar 18 00:40:54 CST 2017 on pts/1
+ 
+查看参数是否生效
+[java@salt-node1 ~]$ ulimit -n
+290000
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,22 @@
+配置服务器屏蔽IP访问:
+
+     若是tomcat服务，可通过简单的配置屏蔽IP地址直接访问。
+     比如，有服务器，IP地址是 192.168.1.2 ，相应域名是 www.mytest.com
+     打开 %TOMCAT_HOME%/conf/server.xml文件
+     找到 Engine节点作如下
+    <Engine name="Catalina" defaultHost="www.myTest.com">       
+      <Host name="www.myTest.com"  appBase="webapps"  
+            unpackWARs="true" autoDeploy="true"  
+            xmlValidation="false" xmlNamespaceAware="false"/>  
+      <Host name="192.168.1.2"  appBase="ipapps"  
+            unpackWARs="true" autoDeploy="true"  
+            xmlValidation="false" xmlNamespaceAware="false"/>  
+    </Engine>  
+
+springmvc xml配置:cvc-elt.1: Cannot find the declaration of element 'beans'
+	因为网络原因访问不到xsd文件,可以配置本地的路径
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	classpath:/org/springframework/beans/factory/xml/spring-beans-4.1.xsd
+
+
+

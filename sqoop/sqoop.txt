@@ -1,4 +1,25 @@
 #!/bin/bash 
+declare -A map=()
+
+a=""
+b=""
+c=0
+while read line
+do
+        if [[ "$line" == *"CREATE EXTERNAL TABLE"* ]];then
+                a=`echo ${line}|awk -F' ' '{print $NF}'`
+                b=""
+        elif [[ "$line" == "("* ]];then
+		c=`expr ${c} + 1 `
+                echo "什么都不干"${c}"次了"
+        elif [[ "$line" == ")"* ]];then
+#               echo ${a%,*} >> out.sh
+                map[$a]=${b%,*}
+        else
+                b=${b}`echo ${line}|awk -F' ' '{print $1}'`","
+        fi
+done < /txdb/ods/offline/hive/srdb/srdb.hql
+
 #导入到hdfs 
 #table_name=表名 
 #-z 开启压缩，GZip 
@@ -42,7 +63,7 @@ sqoop import \
 --driver org.srdbsql.Driver \
 --username ${databaseuser[0]} \
 --password ${databasepwd[0]} \
---query "select * from $database_model.$table_name where \$CONDITIONS" \
+--query "select ${map[$out_table_name]} from $database_model.$table_name where \$CONDITIONS" \
 -z \
 --null-string '' --null-non-string '' \
 --delete-target-dir --target-dir /ods/srdb/jk/$out_table_name \
@@ -54,4 +75,39 @@ sqoop import \
                 echo    >  &6  # &6表示6通道，> &6输出传递给6通道，> 6值传递给6文件
                 echo "$table_name finished"
         }  &  
-done  < /txdb/ods/offline/sqoop/srdb/test
+done  < /txdb/ods/offline/sqoop/srdb/test 
+#阻塞至所有子进程执行完毕
+wait
+
+
+>&j
+默认的，重定向文件描述符1(stdout)到j。所有传递到stdout的输出都送到j中去。我们常用的：
+2>&1 #将标准错误输出到1
+
+0< FILENAME
+< FILENAME
+从文件中接受输入。 ">"是成对命令，并且通常都是结合使用。
+
+[j]<>filename
+把文件打开并且分配文件描述符"j"给它，即给一个打开文件赋予文件描述符（给它标一个指针？）。如果文件"filename"不存在，那么就创建它，。如果文件描述符"j"没指定，那默认是fd 0， stdin。
+#command < input-file > output-file
+
+关闭文件描述符：
+n<&-  关闭输入文件描述符n
+0<&-， <&-  关闭stdin
+n>&-  关闭输出文件描述符n
+1>&-， >&-  关闭stdout
+
+附上一段代码帮助理解： 
+echo 1234567890 > File
+# 写字符串到"File".
+exec 3<> File
+ # 打开"File"并且给它分配fd 3.
+read -n 4 <&3
+# 只读4个字符.
+echo -n . >&3
+# 写一个小数点.
+exec 3>&-
+# 关闭fd 3.
+cat File # ==> 1234.67890
+ # 随机存储.

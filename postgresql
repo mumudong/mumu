@@ -1,0 +1,39 @@
+拼接字符串
+select id, 
+array_to_string 
+( 
+ARRAY ( 
+SELECT kw 
+FROM liutest gi 
+WHERE gi.id = gd.id 
+), 
+', ' 
+) AS group_concat 
+FROM liutest gd 
+ORDER BY 
+id;
+拼接字符串
+CREATE AGGREGATE group_concat(anyelement)
+(
+    sfunc = array_append, -- 每行的操作函数，将本行append到数组里 
+    stype = anyarray,  -- 聚集后返回数组类型 
+    initcond = '{}'    -- 初始化空数组
+);
+insert into   "public".test_tieba2 
+select max(id),
+       max(answer_time),
+       max(author),
+       array_to_string(group_concat(trim(content)),'||||'),
+       null,
+       question_id
+from "public".test_tieba
+group by question_id;
+
+MySQL更新表
+update  "public".test_tieba2 t1,"public".test_tieba_question t2
+set t1.author=t2.title
+where t1.question_id=t2.id;
+
+postgresql更新表
+update  "public".test_tieba3 t1  set t1.author=t2.title from   "public".test_tieba_question t2
+where t1.question_id=t2.id;

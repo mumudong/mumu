@@ -1,2 +1,2 @@
-CREATE USER 'kettle'@'%' IDENTIFIED BY 'kettle'; 
-GRANT all privileges ON *.* TO 'kettle'@'%' ;
+CREATE USER 'etl'@'%' IDENTIFIED BY 'etl'; 
+GRANT all privileges ON etl.* TO 'etl'@'%' ;
