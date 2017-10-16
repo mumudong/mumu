@@ -41,5 +41,5 @@ where t1.question_id=t2.id;
 类似merge into操作
    
  INSERT INTO "public".baidu_news(id, label) VALUES('2077','1')
- ON CONFLICT (id)
+ ON CONFLICT ( id )
 do UPDATE SET label = EXCLUDED.label;
