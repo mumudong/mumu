@@ -1,3 +1,5 @@
+select * from information_schema.tables ;
+
 拼接字符串
 select id, 
 array_to_string 
