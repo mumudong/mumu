@@ -1,0 +1,42 @@
+默认数据库路径
+    mkdir -p /data/db
+也可启动时指定
+    如果你的数据库目录不是/data/db，可以通过 --dbpath 来指定
+ 启动
+     ./mongod
+
+     > db.runoob.insert({x:10})
+     WriteResult({ "nInserted" : 1 })
+     > db.runoob.find()
+     { "_id" : ObjectId("5604ff74a274a611b0c990aa"), "x" : 10 }
+     >
+     第一个命令将数字 10 插入到 runoob 集合的 x 字段中。
+
+MongoDB 提供了简单的 HTTP 用户界面。 如果你想启用该功能，需要在启动的时候指定参数 --rest 。
+     $ ./mongod --dbpath=/data/db --rest
+MongoDB 的 Web 界面访问端口比服务的端口多1000。
+如果你的MongoDB运行端口使用默认的27017，你可以在端口号为28017访问web用户界面，
+    即地址为：http://localhost:28017。
+
+连接本地数据库服务器，端口是默认的。
+mongodb://localhost
+使用用户名fred，密码foobar登录localhost的admin数据库。
+mongodb://fred:foobar@localhost
+使用用户名fred，密码foobar登录localhost的baz数据库。
+mongodb://fred:foobar@localhost/baz
+连接 replica pair, 服务器1为example1.com服务器2为example2。
+mongodb://example1.com:27017,example2.com:27017
+连接 replica set 三台服务器 (端口 27017, 27018, 和27019):
+mongodb://localhost,localhost:27018,localhost:27019
+连接 replica set 三台服务器, 写入操作应用在主服务器 并且分布查询到从服务器。
+mongodb://host1,host2,host3/?slaveOk=true
+直接连接第一个服务器，无论是replica set一部分或者主服务器或者从服务器。
+mongodb://host1,host2,host3/?connect=direct;slaveOk=true
+当你的连接服务器有优先级，还需要列出所有服务器，你可以使用上述连接方式。
+安全模式连接到localhost:
+mongodb://localhost/?safe=true
+以安全模式连接到replica set，并且等待至少两个复制服务器成功写入，超时时间设置为2秒。
+mongodb://host1,host2,host3/?safe=true;w=2;wtimeoutMS=2000
+
+
+
