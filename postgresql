@@ -1,3 +1,5 @@
+select * from information_schema.tables ;
+
 拼接字符串
 select id, 
 array_to_string 
@@ -37,3 +39,9 @@ where t1.question_id=t2.id;
 postgresql更新表
 update  "public".test_tieba3 t1  set t1.author=t2.title from   "public".test_tieba_question t2
 where t1.question_id=t2.id;
+
+类似merge into操作
+   
+ INSERT INTO "public".baidu_news(id, label) VALUES('2077','1')
+ ON CONFLICT ( id )
+do UPDATE SET label = EXCLUDED.label;

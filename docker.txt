@@ -67,32 +67,63 @@ docker run -itdP --net over 10.167.202.170/hx-crawler/common-microservicehx-baid
 
 查看容器运行
 docker ps
+docker ps -as
+
 docker logs dockerid
 
 停止容器   docker stop dockerid
 搜索镜像   docker search httpd
 
 删除镜像   docker rmi    docker rm
-
+docker logs -f container name 噼里啪啦 一大堆....太对，清理掉
 
 进入docker   docker exec -it 4f6889c062ba /bin/sh
-             docker attach 44fc0f0582d9 
+             docker attach 44fc0f0582d9
+
+删除所有容器 docker rm $(docker ps -a -q)
 
 
 
 
 
 
+查看容器的root用户密码    docker logs <容器名orID> 2>&1 | grep '^User: ' | tail -n1
+查看容器日志              docker logs -f <容器名orID>
+删除所有镜像              docker rmi $(docker images | grep none | awk '{print $3}' | sort -r)
+
+运行一个新容器，同时为它命名、端口映射、文件夹映射。以redmine镜像为例
+docker run --name redmine -p 9003:80 -p 9023:22 -d -v /var/redmine/files:/redmine/files -v /var/redmine/mysql:/var/lib/mysql sameersbn/redmine
+
+一个容器连接到另一个容器
+docker run -i -t --name sonar -d -link mmysql:db   tpires/sonar-server
+sonar
+容器连接到mmysql容器，并将mmysql容器重命名为db。这样，sonar容器就可以使用db的相关的环境变量了。
+
+
+当需要把一台机器上的镜像迁移到另一台机器的时候，需要保存镜像与加载镜像。
+机器a                      docker save busybox-1 > /home/save.tar
+机器b                      docker load < /home/save.tar
+
+查看docker资源     docker attach $ID
+
+
+从container中拷贝文件出来
+sudo docker cp 7bb0e258aefe:/etc/debian_version .
+拷贝7bb0e258aefe中的/etc/debian_version到当前目录下。
+注意：只要7bb0e258aefe没有被删除，文件命名空间就还在，可以放心的把exit状态的container的文件拷贝出来
 
 
 
 
+搭建私有仓库
+首先在136机器上下载registry镜像
+$ sudo docker pull registry
+下载完之后我们通过该镜像启动一个容器
+$ sudo docker run -d -p 5000:5000 registry
+默认情况下，会将仓库存放于容器内的/tmp/registry目录下，这样如果容器被删除，则存放于容器中的镜像也会丢失，所以我们一般情况下会指定本地一个目录挂载到容器内的/tmp/registry下，如下：
+$ sudo docker run -d -p 5000:5000 -v /opt/data/registry:/tmp/registry registry
 
 
-
-
-
-
-
-
-
+sudo docker pull busybox
+接下来修改一下该镜像的tag。
+$ sudo docker tag busybox 192.168.112.136:5000/busybox
