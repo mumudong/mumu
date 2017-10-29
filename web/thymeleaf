@@ -1,0 +1,126 @@
+http://www.cnblogs.com/hjwublog/p/5051732.html#_label8
+
+    ${} 变量表达式（美元表达式，哈哈），用于访问容器上下文环境中的变量，功能同jstl中${}。
+    *{} 选择表达式（星号表达式）。选择表达式与变量表达式有一个重要的区别：选择表达式计算的是选定的对象，而不是整个环境变量映射。也就是：只要是没有选择的对象，选择表达式与变量表达式的语法是完全一样的。那什么是选择的对象呢？是一个：th:object对象属性绑定的对象。
+    例如：
+        <div th: object=" ${session. user}" >
+            <p>Name: <span th: text=" *{firstName}" >Sebastian</span>. </p>
+            <p>Surname: <span th: text=" *{lastName}" >Pepper</span>. </p>
+            <p>Nationality: <span th: text=" *{nationality}" >Saturn</span>. </p>
+        </div>
+
+    #{} 消息表达式（井号表达式，资源表达式）。通常与th:text属性一起使用，指明声明了th:text的标签的文本是#{}中的key所对应的value，而标签内的文本将不会显示。
+    例如：
+        新建/WEB-INF/templates/home.html，段落
+            <p th: text=" #{home. welcome}" >This text will not be show! </p>
+        新建/WEB-INF/templates/home.properties，home.welcome：
+             home.welcome=this messages is from home.properties!
+
+
+    简单数据转换（数字，日期）
+        <dd th:text="${#numbers.formatDecimal(product.price, 1, 2)}">180</dd>
+        <dd th:text="${#dates.format(product.availableFrom, 'yyyy-MM-dd')}">2014-12-01</dd>
+        <tr th:each="student : *{students}" th:object="${student}" th:class="${studentStat.odd}?'odd':'even'">
+            <td th:text="*{stuNo}"></td>
+            <td th:text="*{name}"></td>
+            <td th:text="*{sex}"></td>
+            <td th:text="*{age}"></td>
+            <td th:text="*{#dates.format(birthDay,'yyyy-MM-dd HH:mm:ss')}"></td>
+        </tr>
+    一个状态变量包含数据：
+    - index属性，从0开始，当前的迭代索引
+    - count属性，从1开始，当前的迭代索引
+    - size属性，被迭代变量(Iterated variable)中的元素总数
+    - current属性，当前的迭代(Iteration variable)变量
+    - even/odd 布尔属性，当前的迭代是奇数还是偶数
+    - first/last 布尔属性，当前是否是开始的或最后的迭代
+
+    获取时间戳
+        <p th:text="${new java.util.Date().getTime()}"></p>
+    格式化时间
+        [[${#dates.format(new java.util.Date().getTime(), 'yyyy-MM-dd hh:mm:ss')}]]
+        注：[[${}]]这种格式为内联，你也可以使用th:text="${}"
+
+     th:if="${not #lists.isEmpty(prod.comments)}"
+
+
+
+
+
+
+
+
+
+
+
+    th:if="${prodStat.count} &gt; 1"
+    th:text="'Execution mode is ' + ( (${execMode} == 'dev')? 'Development' : 'Production')"
+
+
+
+
+    <p class="lead" th:text="${greeting}+222">111</p>000
+        111不会显示，222前面加号不能省略
+
+    th:text 文本显示。
+    例如：
+        <td class="text" th:text="${username}" ></td>
+
+    th:src 用于外部资源引入，类似于<script>标签的src属性，常与@{}一起使用。
+    例如：
+        <script th:src="@{/resources/js/jquery/jquery.json-2.4.min.js}"
+
+    th:object 用于表单数据对象绑定，将表单绑定到后台controller的一个JavaBean参数。常与th:field一起使用进行表单数据绑定。
+    例如：
+        public class LoginBean implements Serializable{...}
+        @RequestMapping(value = "/login", method = RequestMethod.POST)
+        public String login(@ModelAttribute(value = "loginBean") LoginBean loginBean，ModelMap model) {...}
+        <form id="login-form" th:action="@{/login}" th:object="${loginBean}">...</form>
+
+    th:fragment 声明定义该属性的div为模板片段，常用与头文件、页尾文件的引入。常与th:include，th:replace一起使用。
+    例如：
+        声明模板片段/WEBINF/templates/footer. html
+        <div th: fragment=" copy" >
+        © 2011 The Good Thymes Virtual Grocery
+        </div>
+        引入模板片段
+        <div th: include=" /templates/footer : : copy" ></div>
+        <div th: replace=" /templates/footer : : copy" ></div>
+
+    th:if 条件判断。
+    例如：
+        <div th:if="${rowStat.index} == 0">... do something ...</div>
+
+    th:id div id声明，类似html标签中的id属性。
+    例如：
+        <div class="student" th:id = "stu+(${rowStat.index}+1)"></div>
+
+    th:href 定义超链接，类似<a>标签的href 属性。value形式为@{/logout}
+    例如：
+        <a th:href="@{/logout}" class="signOut"></a>
+
+    th:each 对象遍历，功能类似jstl中的<c:forEach>标签。
+    例如：
+    stuIter代表students的迭代器
+    <form id="login-form" th:action="@{/addStudent}"  th:object="${stuReqBean}" method="POST">
+        <div class="student" th:each="stuIter,rowStat:${stuReqBean.students}">
+            <input type="text" class="firstName" value=""  th:field="*{students[__${rowStat.index}__].firstName}"></input>
+            <input type="text" class="school" value="" th:field="*{students[__${rowStat.index}__].school}"></input>
+        </div>
+    </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
