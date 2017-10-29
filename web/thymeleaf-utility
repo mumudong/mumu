@@ -77,3 +77,21 @@ ${#strings.concatReplaceNulls(str)}
  * Random
  */
 ${#strings.randomAlphanumeric(count)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
