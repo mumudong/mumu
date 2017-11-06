@@ -1,0 +1,62 @@
+azkaban-common : 常用工具类。
+azkaban-db : 对应的sql脚本
+azkaban-hadoop-secutity-plugin : hadoop 有关kerberos插件
+azkaban-solo-server: web和executor 一起的项目。
+azkaban-web/executor-server:azkaban的 web和executor的server信息
+azkaban-spi: azkaban存储接口以及exception类
+
+3.在数据库中执行azkaban-db下的sql ：
+
+解压 azkaban-exec     azkaban-web     azkaban-solo
+将solo下的conf拷贝至azkaban-exec下， azkaban-web下  删除global.properties即可。
+将solo下的plugins拷贝至azkaban-exec下
+6.在azkaban-exec  和  azkaban-web下创建logs文件夹，并将mysql-connect jar复制到lib文件夹下。
+
+7.多个executor只需要配置链接到同一个数据库就可以了。executor会自动查询executor这张表中，
+
+但是默认active为0,需要手动修改 active为1.azkaban-web在启动时才会注册这些executor。注意，添加了executor需要重启web.
+insert into executors(ip,port) values()  executor的IP和端口  active 0 改为 1 ?
+
+8.配置文件修改  /azkaban-web/conf/azkaban.properties:
+
+database.type=mysql
+mysql.port=3306
+mysql.host=192.168.131.114
+mysql.database=azkaban
+mysql.user=xinba
+mysql.password=123456
+
+mail.sender=shudong1989@163.com
+mail.host=smtp.163.com
+mail.user=mudong
+mail.password=mu19891112
+job.failure.email=850886448@qq.com
+job.success.email=850886448@qq.com
+
+
+azkaban-web独有部分
+        #Multiple Executor Mode
+        #open it if you use the multiple executor mode
+        azkaban.use.multiple.executors=true
+        #azkaban.executorselector.filters=StaticRemainingFlowSize,MinimumFreeMemory,CpuStatus
+        azkaban.executorselector.filters=StaticRemainingFlowSize,CpuStatus
+        azkaban.executorselector.comparator.NumberOfAssignedFlowComparator=1
+        azkaban.executorselector.comparator.Memory=1
+        azkaban.executorselector.comparator.LastDispatched=1
+        azkaban.executorselector.comparator.CpuUsage=1
+azkaban-executor独有部分呢
+        default.timezone.id=Asia/Shanghai   #时区
+        executor.maxThreads=50    #最大线程数
+        executor.port=12321       #端口号(如修改,请与web服务中一致)
+        executor.flow.threads=30  #线程数
+
+9.  ？？？？
+将log4j文件拷贝至azkaban-exec  和  azkaban-web下否则会在启动时出现
+Exception: java.lang.StackOverflowError thrown from the UncaughtExceptionHandler in thread "main"
+
+10，启动
+bin/azkaban-executor-start.sh  1>logs/stdout.log  2>logs/stderr.log
+nohup bin/azkaban-web-start.sh 1> logs/stdout.log 2>logs/stderr.log
+
+https://服务器IP地址:8081
+

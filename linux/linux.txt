@@ -52,7 +52,7 @@ service myserviced stop
 这样的好处是防止错误像滚雪球般变大导致一个致命的错误，而这些错误本应该在之前就被处理掉。如果要增加可读性，
 可以使用set -o errexit，它的作用与set -e相同。
 command  
-if [ "$?"-ne 0]; then   
+if [ "$?" -ne 0]; then
     echo "command failed";   
     exit 1;   
 fi   
@@ -74,23 +74,29 @@ exec 3<&-
 
 exec 6>&1
 #将标准输出与fd 6绑定
+
 [chengmo@centos5
  shell]$ ls  /proc/self/fd/ 
 0  1  2  3  6
 #出现文件描述符6
+
 [chengmo@centos5
  shell]$ exec 1>suc.txt
 #将接下来所有命令标准输出，绑定到suc.txt文件（输出到该文件）
+
 [chengmo@centos5
  shell]$ ls -al
 #执行命令，发现什么都不返回了，因为标准输出已经输出到suc.txt文件了
 [chengmo@centos5
+
  shell]$ exec 1>&6
 #恢复标准输出
+
 [chengmo@centos5
  shell]$ exec 6>&-
 #关闭fd
  6描述符
+
 [chengmo@centos5
  ~]$ ls /proc/self/fd/
 0  1  2  3
