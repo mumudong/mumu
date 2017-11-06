@@ -112,34 +112,34 @@ do
         echo "init."  
 done >&6  
   
-while read line   
-do   
+while read line
+do
     read -u6
         {       table_name="$line"
-                if [[ "$table_name" == $prefix* ]] 
-                then 
-                out_table_name=$table_name 
-                else 
-                out_table_name=$prefix$table_name 
-                fi 
+                if [[ "$table_name" == $prefix* ]]
+                then
+                out_table_name=$table_name
+                else
+                out_table_name=$prefix$table_name
+                fi
                 
                 
-                sqoop import \ 
-                --connect jdbc:srdbsql://${databaseip[0]}:${databaseport[0]}/${databasetable[0]} \ 
-                --driver org.srdbsql.Driver \ 
-                --username ${databaseuser[0]} \ 
-                --password ${databasepwd[0]} \ 
-                --query "select \ 
-                * \ 
-                from $database_model.$table_name where \$CONDITIONS" \ 
-                -z \ 
-                --null-string '' --null-non-string '' \ 
-                --delete-target-dir --target-dir /ods/srdb/jk/$out_table_name \ 
-                --fields-terminated-by '\001' -m 1 
-                if [ $? -ne 0 ] 
-                then 
-                echo $table_name >> /txdb/ods/offline/sqoop/srdb/jk/impl/BUG_table 
-                fi   
+                sqoop import \
+                --connect jdbc:srdbsql://${databaseip[0]}:${databaseport[0]}/${databasetable[0]} \
+                --driver org.srdbsql.Driver \
+                --username ${databaseuser[0]} \
+                --password ${databasepwd[0]} \
+                --query "select \
+                * \
+                from $database_model.$table_name where \$CONDITIONS" \
+                -z \
+                --null-string '' --null-non-string '' \
+                --delete-target-dir --target-dir /ods/srdb/jk/$out_table_name \
+                --fields-terminated-by '\001' -m 1
+                if [ $? -ne 0 ]
+                then
+                echo $table_name >> /txdb/ods/offline/sqoop/srdb/jk/impl/BUG_table
+                fi
                 echo    >& 6
 				echo "$table_name finished"
         }  &  
