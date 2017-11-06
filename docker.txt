@@ -127,3 +127,7 @@ $ sudo docker run -d -p 5000:5000 -v /opt/data/registry:/tmp/registry registry
 sudo docker pull busybox
 接下来修改一下该镜像的tag。
 $ sudo docker tag busybox 192.168.112.136:5000/busybox
+
+
+
+docker build -t 10.167.211.250/crawler/common-microservicehx-baidurss:0.0.1-SNAPSHOT -f Dockerfile .
