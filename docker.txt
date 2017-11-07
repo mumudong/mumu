@@ -131,3 +131,38 @@ $ sudo docker tag busybox 192.168.112.136:5000/busybox
 
 
 docker build -t 10.167.211.250/crawler/common-microservicehx-baidurss:0.0.1-SNAPSHOT -f Dockerfile .
+
+
+docker安装
+1.内核
+通过uname命令来检查内核版本信息。
+1）使用root权限登录系统
+2）更新系统包到最新
+yum -y update
+2，建yum配置
+cat >/etc/yum.repos.d/docker.repo <<-EOF
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/7
+enabled=1
+gpgcheck=1
+gpgkey=https://yum.dockerproject.org/gpg
+EOF
+
+
+
+
+
+yum makecache
+yum -y update
+yum list all
+
+docker卸载
+1.列出安装的软件包
+    yum list installed | grep docker
+2.移除软件包
+    yum -y remove docker-engine.x86_64
+上面的命令不会删除镜像、容器，卷组和用户自配置文件。
+3.删除所有镜像、容器和组
+    rm -rf /var/lib/docker
+
