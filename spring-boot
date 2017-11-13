@@ -1,0 +1,23 @@
+热部署：
+    1：添加依赖
+	      <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-devtools</artifactId>
+	        <optional>true</optional>
+		  </dependency>
+    2： Shift+Ctrl+Alt+/，选择Registry
+        compiler.automake.allow.when.app.running  打钩
+
+
+
+
+
+
+
+
+
+
+
+
+
+
