@@ -1,4 +1,13 @@
 1，基础知识。
+#!bin/bash
+su root<<EOF
+12qwaszx
+whoami
+pwd
+ifconfig
+whoami
+EOF
+
 #!/usr/bin/expect -f
 #不可以去掉spawn，英文expect中没有ssh命令
 spawn ssh root@mu4   
