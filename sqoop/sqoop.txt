@@ -13,35 +13,36 @@ do
                 a=`echo ${line}|awk -F' ' '{print $NF}'`
                 b=""
         elif [[ "$line" == "("* ]];then
-		c=`expr ${c} + 1 `
-                echo "????????"${c}"????"
+                c=`expr ${c} + 1 `
+                echo "读建表语句"${c}"次了"
         elif [[ "$line" == ")"* ]];then
 #               echo ${a%,*} >> out.sh
                 map[$a]=${b%,*}
         else
                 b=${b}`echo ${line}|awk -F' ' '{print $1}'`","
         fi
-done < /txdb/ods/offline/hive/srdb/srdb.hql
+done < /data/testHive/sqoop/srdb.hql
 
-#????hdfs
-#table_name=????
-#-z ?????????GZip
-#--compression-codec org.apache.hadoop.io.compress.BZip2Codec BZip???
-databaseip=(`awk -F '|' '{print $1}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`)
-databaseport=(`awk -F '|' '{print $2}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`)
-databasetable=(`awk -F '|' '{print $3}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`)
-databaseuser=(`awk -F '|' '{print $4}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`)
-databasepwd=(`awk -F '|' '{print $5}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`)
-database_model=(`awk -F '|' '{print $6}' /txdb/ods/offline/sqoop/srdb/database_config.cfg`)
+echo > /data/testHive/sqoop/BUG_table
+#导入到hdfs
+#table_name=表名
+#-z 开启压缩，GZip
+#--compression-codec org.apache.hadoop.io.compress.BZip2Codec BZip格式
+databaseip=(`awk -F '|' '{print $1}' /data/testHive/sqoop/database_config.cfg`)
+databaseport=(`awk -F '|' '{print $2}' /data/testHive/sqoop/database_config.cfg`)
+databasetable=(`awk -F '|' '{print $3}' /data/testHive/sqoop/database_config.cfg`)
+databaseuser=(`awk -F '|' '{print $4}' /data/testHive/sqoop/database_config.cfg`)
+databasepwd=(`awk -F '|' '{print $5}' /data/testHive/sqoop/database_config.cfg`)
+database_model=(`awk -F '|' '{print $6}' /data/testHive/sqoop/database_config.cfg`)
 
 
 prefix="t_"
 out_table_name=""
-PRONUM=10               #???????
+PRONUM=15              #进程个数
 
-tmpfile="$$.fifo"        #????????????
+tmpfile="$$.fifo"        #临时生成管道文件
 mkfifo $tmpfile
-exec 6<>$tmpfile    #???????????????6
+exec 6<>$tmpfile
 rm $tmpfile
 
 for(( i=0; i<$PRONUM; i++ ))
@@ -66,22 +67,38 @@ sqoop import \
 --driver org.srdbsql.Driver \
 --username ${databaseuser[0]} \
 --password ${databasepwd[0]} \
---query "select ${map[$out_table_name]} from $database_model.$table_name where \$CONDITIONS" \
+--query "select  ${map[$out_table_name]}  from $database_model.$table_name where \$CONDITIONS" \
 -z \
 --null-string '' --null-non-string '' \
 --delete-target-dir --target-dir /ods/srdb/jk/$out_table_name \
+--hive-drop-import-delims \
+--lines-terminated-by '\n' \
 --fields-terminated-by '\001' -m 1
                 if [ $? -ne 0 ]
                 then
-                echo $table_name >> /txdb/ods/offline/sqoop/srdb/jk/impl/BUG_table
+                echo "$table_name""======导出失败======" >> /data/testHive/sqoop/BUG_table
                 fi
-                echo    >  &6
+                echo "$table_name""已经导出完毕" >> /data/testHive/sqoop/BUG_table
+                echo    >& 6
                 echo "$table_name finished"
         }  &
-done  < /txdb/ods/offline/sqoop/srdb/test
-#?????????????????????
+done  < /data/testHive/sqoop/jk_table_list
 wait
+exec 6>&-
 
+set -e
+error_flag="no"
+while read line
+do
+        if [[ "$line" == *"导出失败"* ]];then
+                echo $line
+                error_flag="yes"
+        fi
+done < /data/testHive/sqoop/BUG_table
+if [[ "${error_flag}" == "yes" ]];then
+        exit 1
+fi
+exit 0;
 
 >&j
 ???????????????????1(stdout)??j?????д????stdout??????????j??????????????
