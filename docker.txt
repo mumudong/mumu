@@ -50,7 +50,9 @@ $ sudo docker run -d --name redis example/redis --bind 127.0.0.1
 $ # use the redis container's network stack to access localhost
 $ sudo docker run --rm -ti --net container:redis example/redis-cli -h 127.0.0.1
 
-
+sudo service docker
+docker login 10.167.211.250 -u admin -p Xinhe2017
+ sudo service docker restart
 
 /etc/hosts文件中会包含容器的hostname信息，我们也可以使用--add-host这个参数来动态添加/etc/hosts中的数据。
 $ /docker run -ti --add-host db-static:86.75.30.9 ubuntu cat /etc/hosts
@@ -130,7 +132,7 @@ $ sudo docker tag busybox 192.168.112.136:5000/busybox
 
 
 
-docker build -t 10.167.211.250/crawler/common-microservicehx-baidurss:0.0.1-SNAPSHOT -f Dockerfile .
+docker build   -t 10.167.211.250/crawler/common-microservicehx-baidurss:0.0.1-SNAPSHOT wenjianjia/
 
 
 docker安装
