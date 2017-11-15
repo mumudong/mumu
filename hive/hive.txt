@@ -325,6 +325,29 @@ select a.DICT_HOUSE_TYPE,a.DICT_HOUSE_TYPE_REMARK from t_loan_house a limit 10;
 select * from t_gl_dict where label like '%公积金按揭购房%';
 
 
+--------------------------------------------------------------------------------
+================================================================================
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+show partitions people;
+
+重命名分区的语句如下：
+ALTER TABLE table_name PARTITION partition_spec RENAME TO PARTITION partition_spec;
+
+ALTER TABLE page_view ADD PARTITION (dt='2008-08-08', country='us')
+location '/path/to/us/part080808' PARTITION (dt='2008-08-09',country='us') location '/path/to/us/part080809';
+
+ALTER TABLE table_name SET TBLPROPERTIES('comment' = new_comment);
+
+ALTER TABLE employee ADD COLUMNS (dept STRING COMMENT 'Department name');
+
+删除既存的指定列
+ALTER TABLE name DROP [COLUMN] column_name
+例子：hive> ALTER TABLE employee DROP name;
+
+ALTER TABLE employee CHANGE name ename String;
+
+ALTER TABLE employee REPLACE COLUMNS (eid INT empid Int,ename STRING name String);
 
 
 
