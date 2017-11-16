@@ -2,6 +2,9 @@ elastic search
 	安装:http://blog.csdn.net/sinat_28224453/article/details/51134978
 	与hbase整合
 	./elasticsearch -Des.insecure.allow.root=true
+	elasticsearch-ik分词插件:https://github.com/medcl/elasticsearch-analysis-ik/releases
+
+
 hdf安装
 	
 神经网络
