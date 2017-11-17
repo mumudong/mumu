@@ -1,3 +1,11 @@
+中文权威指南https://www.elastic.co/guide/cn/elasticsearch/guide/current/getting-started.html
+
+GET _analyze
+{
+  "analyzer": "ik",
+  "text": "我是JACK"
+}
+
 curl -XPUT hadoop-5:9200/testIndex -d '{
 "settings":{
         "index": {
