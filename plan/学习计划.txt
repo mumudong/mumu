@@ -4,6 +4,83 @@ elastic search
 	./elasticsearch -Des.insecure.allow.root=true
 	elasticsearch-ik分词插件:https://github.com/medcl/elasticsearch-analysis-ik/releases
 
+    groupadd elasticsearch
+    useradd elasticsearch -g elasticsearch
+    chown -R elasticsearch.elasticsearch /opt/elasticsearch-5.6.4/
+
+    2、安装出现的错误一： max file descriptors [4096] for elasticsearch process likely too low, increase to at least [65536]
+    解决方法：切换到root用户，进入vi /etc/security/limits.conf
+        [plain] view plain copy
+        work soft nofile 819200
+        work hard nofile 819200
+    3、安装错误二： max number of threads [1024] for user [work] likely too low, increase to at least [2048]
+    解决方法：进入limits.d下的配置文件：vi /etc/security/limits.d/90-nproc.conf ，修改配置如下：
+        [plain] view plain copy
+        *          soft    nproc     1024
+        修改为：
+        *          soft    nproc     2048
+    4、安装错误三： max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]
+    解决方法：修改sysctl文件：vi /etc/sysctl.conf ，增加下面配置项：
+        [plain] view plain copy
+        增加改行配置：vm.max_map_count=655360
+        保存退出后，执行：
+        sysctl -p
+        sysctl -w vm.max_map_count=262144
+
+engix反向代理elasticsearch  http://blog.csdn.net/hereiskxm/article/details/47299543
+elasticsearch.yml
+     curl -XPUT -u elastic:changeme 'hadoop-5:9200/_xpack/security/user/elastic/_password' -d '{ "password" : "elastic" }'
+
+        cluster.name: es-tx
+        node.name: node1
+        bootstrap.memory_lock: false
+        bootstrap.system_call_filter: false
+        network.host: hadoop-5
+        http.port: 9200
+        node.master: true
+        node.data: true
+        path.data: /data/node1/es
+        path.logs: /data/node1/eslogs
+        discovery.zen.fd.ping_timeout: 100s
+        discovery.zen.minimum_master_nodes: 2
+        discovery.zen.ping_timeout: 100s
+        discovery.zen.ping.unicast.hosts: ["10.167.2222.105","10.167.222.106","10.167.222.107"]
+        http.cors.enabled: true
+        http.cors.allow-origin: "*"
+
+=========================
+========================
+"status": {
+         "type":  "string", //字符串类型
+         "index": "analyzed"//分词，不分词是：not_analyzed ，设置成no，字段将不会被索引
+         "analyzer":"ik"//指定分词器
+         "boost":1.23//字段级别的分数加权
+          "doc_values":false//对not_analyzed字段，默认都是开启，分词字段不能使用，对排序和聚合能提升较大性能，节约内存
+           "fielddata":{"format":"disabled"}//针对分词字段，参与排序或聚合时能提高性能，不分词字段统一建议使用doc_value
+           "fields":{"raw":{"type":"string","index":"not_analyzed"}} //可以对一个字段提供多种索引模式，同一个字段的值，一个分词，一个不分词
+           "ignore_above":100 //超过100个字符的文本，将会被忽略，不被索引
+           "include_in_all":ture//设置是否此字段包含在_all字段中，默认是true，除非index设置成no选项
+           "index_options":"docs"//4个可选参数docs（索引文档号） ,freqs（文档号+词频），positions（文档号+词频+位置，通常用来距离查询），offsets（文档号+词频+位置+偏移量，通常被使用在高亮字段）分词字段默认是position，其他的默认是docs
+           "norms":{"enable":true,"loading":"lazy"}//分词字段默认配置，不分词字段：默认{"enable":false}，存储长度因子和索引时boost，建议对需要参与评分字段使用 ，会额外增加内存消耗量
+            "null_value":"NULL"//设置一些缺失字段的初始化值，只有string可以使用，分词字段的null值也会被分词
+            "position_increament_gap":0//影响距离查询或近似查询，可以设置在多值字段的数据上火分词字段上，查询时可指定slop间隔，默认值是100
+             "store":false//是否单独设置此字段的是否存储而从_source字段中分离，默认是false，只能搜索，不能获取值
+              "search_analyzer":"ik"//设置搜索时的分词器，默认跟ananlyzer是一致的，比如index时用standard+ngram，搜索时用standard用来完成自动提示功能
+               "similarity":"BM25"//默认是TF/IDF算法，指定一个字段评分策略，仅仅对字符串型和分词类型有效
+               "term_vector":"no"//默认不存储向量信息，支持参数yes（term存储），with_positions（term+位置）,with_offsets（term+偏移量），with_positions_offsets(term+位置+偏移量) 对快速高亮fast vector highlighter能提升性能，但开启又会加大索引体积，不适合大数据量用
+       }
+
+
+
+
+kibana.yml
+    server.port: 5601
+    server.host: 0.0.0.0
+    server.name: kibana
+    elasticsearch.url: "http://hadoop-5:9200"
+
+
+
 
 hdf安装
 	
