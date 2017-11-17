@@ -1,8 +1,7 @@
-中文权威指南https://www.elastic.co/guide/cn/elasticsearch/guide/current/getting-started.html
 
 GET _analyze
 {
-  "analyzer": "ik",
+  "analyzer": "ik_max_word",
   "text": "我是JACK"
 }
 
