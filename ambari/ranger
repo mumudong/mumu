@@ -1,0 +1,45 @@
+针对hive
+add new service
+
+sevice name: test-hive
+active status: enabled
+username*:  hdfs
+password*: ....
+jdbc.driverClassName *: org.apache.hive.jdbc.HiveDriver
+jdbc.url *:jdbc:hive2://10.167.222.103:10000
+Add New Configurations
+Name	Value
+
+tag.download.auth.users:        hive
+policy.download.auth.users:     hive
+policy.grantrevoke.auth.users:  hive
+
+test-hive Policies
+Access配置
+Users:etl
+Policy Name*:  all - database, table, column
+Hive Databases*:    *
+table*:     *
+Hive Column*:   *
+Audit Logging: Yes
+
+
+==================================
+==================================
+针对Hadoop
+
+Namenode URL *:     hdfs://10.167.222.101:8020
+Authorization Enabled:  false ?
+Authentication Type *:  Simple
+hadoop.security.auth_to_local:  DEFAULT
+RPC Protection Type:    Authentication
+
+
+Policy Name *: all - path
+Resource Path*: /*
+recursive: on
+
+
+
+
+
