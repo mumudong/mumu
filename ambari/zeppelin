@@ -1,0 +1,26 @@
+集成hive  %hive
+default.driver	org.apache.hive.jdbc.HiveDriver
+default.url	    jdbc:hive2://hadoop-3:10000/
+default.user	hdfs
+
+Dependencies
+mysql:mysql-connector-java:5.1.40
+org.apache.hadoop:hadoop-common:2.7.3
+org.apache.hive:hive-jdbc:1.2.1000.2.4.2.11-1
+
+集成jdbc  %jdbc
+default.driver	org.postgresql.Driver
+default.url	    jdbc:postgresql://localhost:5432/
+default.user	gpadmin
+
+
+
+
+
+
+
+
+
+
+
+
