@@ -1,0 +1,53 @@
+input {
+    file {
+        path => ["/Users/KG/Documents/logs/app-a/*.log"]
+        type => "app-a"
+    }
+    file {
+        path => ["/Users/KG/Documents/logs/app-b/*.log"]
+        type => "app-b"
+    }
+}
+
+output {
+    stdout {
+      codec => rubydebug
+    }
+    if [type] == "app-a" {
+       elasticsearch {
+            hosts => "localhost:9200"
+            index =>  "app-a-%{+YYYY.MM.dd}"
+            document_type => "log4j_type"
+            user => elastic
+            password => changeme
+        }
+    }
+    else if [type] == "app-b" {
+        elasticsearch {
+            hosts => "localhost:9200"
+            index => "app-b-%{+YYYY.MM.dd}"
+            document_type => "log4j_type"
+            user => elastic
+            password => changeme
+        }
+    }
+}
+=====================
+=====================
+input {
+    tcp {
+        port => 4569
+        codec => "json" 该接口传输的是json数据
+    }
+}
+
+output {
+
+     elasticsearch {
+        action => "index"
+        hosts => ["IP:prot"]
+        index => "%{[appname]}" json中的appname字段
+        }
+
+
+}

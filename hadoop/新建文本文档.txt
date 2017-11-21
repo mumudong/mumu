@@ -3,7 +3,7 @@
 1.配置history server,在etc/Hadoop/mapred-site.xml中配置以下内容.
 
 [html] view plain copy 在CODE上查看代码片派生到我的代码片
-<span style="font-size:18px;"><span style="font-size:18px;">  <property>  
+ <property>
     <name>mapreduce.jobhistory.address</name>  
      <value>localhost:10020</value>  
   </property>  
