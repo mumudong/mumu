@@ -1,0 +1,91 @@
+Elasticsearch的mapping一旦创建，只能增加字段，而不能修改已经mapping的字段。但现实往往并非如此啊，有时增加一个字段，就好像打了一个补丁，一个可以，但是越补越多，最后自己都觉得惨不忍睹了。怎么办？？
+
+这里有一个方法修改mapping，那就是重新建立一个index，然后创建一个新的mapping。你可能会问，这要是在生产环境，可行吗？答案是，如果你一开始就采取了合适的设计，这个完全是可以做到平滑过渡的。
+
+采取什么合理设计呢？就是我们的程序访问索引库时，始终使用同义词来访问，而不要使用真正的indexName。在reindex完数据之后，修改之前的同义词即可。明白了吗？
+
+
+
+参考上面的思路，我们来一步一步做。
+
+step1、创建一个索引，这个索引的名称最好带上版本号，比如my_index_v1,my_index_v2等。
+
+step2、创建一个指向本索引的同义词。
+
+Java代码  收藏代码
+curl -XPOST localhost:9200/_aliases -d '
+{
+    "actions": [
+        { "add": {
+            "alias": "my_index",
+            "index": "my_index_v1"
+        }}
+    ]
+}
+'
+
+
+ 此时，你可以通过同义词my_index访问。包括创建索引，删除索引等。
+
+
+
+step3，需求来了，需要更改mapping了，此时，你需要创建一个新的索引，比如名称叫my_index_v2（版本升级）.，在这个索引里面创建你新的mapping结构。然后，将新的数据刷入新的index里面。在刷数据的过程中，你可能想到直接从老的index中取出数据，然后更改一下格式即可。如何遍历所有的老的index数据，请参考这里。
+
+step4，修改同义词。将指向v1的同义词，修改为指向v2。http接口如下：
+
+Java代码  收藏代码
+curl -XPOST localhost:9200/_aliases -d '
+{
+    "actions": [
+        { "remove": {
+            "alias": "my_index",
+            "index": "my_index_v1"
+        }},
+        { "add": {
+            "alias": "my_index",
+            "index": "my_index_v2"
+        }}
+    ]
+}
+'
+ step5，删除老的索引。
+
+Java代码  收藏代码
+curl -XDELETE localhost:9200/my_index_v1
+
+
+ 除此之外，还有几个其他的方法也可以更改mapping。
+
+1、修改程序，添加字段。
+
+就是说，你可以在mapping中增加一个新的字段，然后你对新的字段进行访问统计搜索。这个就要修改两个地方，一个是修改mapping增加字段，还有就是修改你的程序，把字段改成新的字段。
+
+2、更改字段类型为multi_field。
+
+multi_field允许为一个字段设置多个数据类型。应用multi_field的一个最典型的场景是：一个类型定义为analyed，这个字段可以被搜索到，一个类型定义为不分词，这个字段用于排序。
+
+任何字段都可以被更新为multi_field（类型为object和nested的类型除外）。假设现在有一个字段，名字叫created，类型现在为string。
+
+Java代码  收藏代码
+{     "created": { "type": "string"} }
+ 我们可以将它增加一种类型，使他既能被当做字符串又能当做日期型。
+
+Java代码  收藏代码
+curl -XPUT localhost:9200/my_index/my_type/_mapping -d '
+{
+    "my_type": {
+        "properties": {
+            "created": {
+                "type":   "multi_field",
+                "fields": {
+                    "created": { "type": "string" },
+                    "date":    { "type": "date"   }
+                }
+            }
+        }
+    }
+}
+'
+
+
+采用标准的重建索引方式的时候，我们推荐大家为每一个type都建立一个索引同义词，即便在同一个索引库中的多个type，也推荐使用建立一个同义词来访问。即一个index里面包含一个type，因为在elasticsearch中，跨index查询数据是很方便的。这样，我们就可以在reindex一个type后，立即将type生效，而不是将index下面所有的type都重建完后，同义词才能生效。

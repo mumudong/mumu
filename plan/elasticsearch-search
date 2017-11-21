@@ -37,7 +37,13 @@ curl -XPUT hadoop-5:9200/testIndex -d '{
      }
    }
 }'
-
+删除数据
+POST edemo/test/_delete_by_query?conflicts=proceed
+{
+  "query": {
+    "match_all": {}
+  }
+}
 
 查看：curl -XGET http://192.168.80.10:9200/zhouls/_settings?pretty
 
