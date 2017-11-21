@@ -9,6 +9,28 @@
    2，通过启动时添加--log-slow-queries=filename，mysqld将会把执行时间超过long_query_time秒的sql语句写入日志
       show processlist命令可查看当前进行的线程，可查看线程状态，是否锁表等。
 3，explain分析低效sql的执行计划
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
  
  
