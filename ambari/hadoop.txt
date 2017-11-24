@@ -1,0 +1,14 @@
+Put the NameNode in Safe Mode (read-only mode):
+sudo su hdfs -l -c 'hdfs dfsadmin -safemode enter'
+Once in Safe Mode, create a Checkpoint:
+sudo su hdfs -l -c 'hdfs dfsadmin -saveNamespace'
+Initialize the JournalNodes by running:
+sudo su hdfs -l -c 'hdfs namenode -initializeSharedEdits'
+Initialize the metadata for NameNode automatic failover by running:
+sudo su hdfs -l -c 'hdfs zkfc -formatZK'
+
+Login to the Additional NameNode host hdp-2.
+Important! Be sure to login to the Additional NameNode host.
+This is a different host from the Steps 1 and 2 above.
+Initialize the metadata for the Additional NameNode by running:
+sudo su hdfs -l -c 'hdfs namenode -bootstrapStandby'
