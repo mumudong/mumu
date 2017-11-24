@@ -1,6 +1,7 @@
 select * from information_schema.tables ;
 select * from information_schema.columns where data_type like '%bit%'  ;
 
+select table_schema from information_schema.tables where table_name='t_gl_org';
 
 select * from information_schema.tables order by table_name limit 5 offset 0 ;
 意思是，起点0开始查询，返回5条数据。
