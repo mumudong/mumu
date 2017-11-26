@@ -1,13 +1,88 @@
 
 mongodb开机服务
 mongod.exe --bind_ip yourIPadress --logpath "E:\home\mongodb\mongodb.log" --logappend ^
---dbpath "E:\home\mongodb" --port 20000 --serviceName "mu_mongodb" ^
+--dbpath "E:\home\mongodb" --port 27017 --serviceName "mu_mongodb" ^
 --serviceDisplayName "mu_mongodb" --install
 然后：net start mu_mongodb
 
-或者直接启动：mongod.exe  --dbpath E:\home\mongodb --port 22222
+或者直接启动：mongod.exe --dbpath E:\mongodb --port 27017
 
 
 select * from t_gl_dict where label like '%征信%';
 
 mongod.exe --bind_ip yourIPadress --logpath "E:\home\mongodb\mongodb.log" --logappend --dbpath "E:\home\mongodb" --port 20000 --serviceName "mu_mongodb" --serviceDisplayName "mu_mongodb" --install
+
+
+#切换数据库
+>use admin
+
+#新增管理员
+>db.createUser({user: "admin",pwd: "123456",roles:[{role:"userAdminAnyDatabase", db: "admin" } ]})
+
+#切换数据库
+>use cas-mongo-database
+
+# 新增用户
+>db.createUser({user: "cas-config",pwd: "123456",roles: [ { role: "readWrite", db: "cas-mongo-database" }]})
+
+#重启并开启认证
+>mongod.exe --auth
+
+db.auth(“root”,”root”)，输出一个结果值为1，说明这个用户匹配上了，如果用户名、密码不对，输出为0
+
+使用用户名和密码连接登陆到指定数据库，格式如下：
+mongodb://admin:123456@localhost/test
+
+查询某个数据库下的用户db.system.users.find();
+删除某个数据库下的所有用户db.system.users.remove()，删除指定用户db.system.users.remove({'user':'用户名'})
+
+use db
+db.auth("name","password")
+
+
+> use runoob
+switched to db runoob
+> db
+runoob
+> show dbs
+local  0.078GB
+test   0.078GB
+执行删除命令：
+> db.dropDatabase()
+{ "dropped" : "runoob", "ok" : 1 }
+
+
+以下实例删除了 runoob 数据库中的集合 site：
+> use runoob
+switched to db runoob
+> show tables
+site
+> db.site.drop()
+true
+> show tables
+>show collections
+
+> db.col.find().pretty()
+>db.col.remove({'title':'MongoDB 教程'})
+>db.col.find({key1:value1, key2:value2}).pretty()
+>db.col.find(
+   {
+      $or: [
+         {key1: value1}, {key2:value2}
+      ]
+   }
+).pretty()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
