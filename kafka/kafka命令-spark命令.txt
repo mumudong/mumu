@@ -68,7 +68,7 @@ shutdown broker
 ./kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper localhost:2181 --group test-consumer-group --topic tx
 
 修改偏移量(进入zookeeper设置)
-set /consumers/test-consumer-group/offsets/tx/0 0
+set /consumers/test-consumer-group/offsets/tx/0 1442
  -------------------------------
  =============================
  ---------------------------------
