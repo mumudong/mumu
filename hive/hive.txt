@@ -1,9 +1,13 @@
-ALTER TABLE foo 
+hive中四个hook
+使用hive.semantic.analyzer.hook
+可以控制权限。
+
+ALTER TABLE foo
     SET FILEFORMAT 
         INPUTFORMAT "com.hadoop.mapred.DeprecatedLzoTextInputFormat" 
         OUTPUTFORMAT "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutpu
-		
-		
+
+
  1 进入mysql ，执行
 
 show create database hive 
