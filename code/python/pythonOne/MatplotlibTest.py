@@ -19,7 +19,7 @@ y_data = y + random.normal(scale=0.3,size=100)
 plt.figure('data')
 
 # '.'表明画散点图,每个散点形状是个圆圈
-plt.plot(x,y_data,',')
+plt.plot(x,y_data,'.')
 
 #plot默认画连线图
 plt.figure('model')
