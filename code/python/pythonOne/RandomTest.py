@@ -4,6 +4,7 @@ from numpy import *
 
 random.seed(42) # 这样下面的方法都不随机了
 print('rand(2,3)------>\n',random.rand(2,3))  #产生一个2x3，[0,1)之间的浮点型随机数
+print('randn(10)------->\n',random.randn(10))
 print('sample(2,3)------>\n',random.sample((2,3)))
 print('ranf(2,3)------>\n',random.ranf((2,3)))
 print('rand ------>\n',random.rand())
