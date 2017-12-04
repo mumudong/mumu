@@ -1,10 +1,11 @@
 YCSB编译
 mvn -pl com.yahoo.ycsb:hbase12-binding -am clean package
+create 'test', 'col', SPLITS => ['user1', 'user2','user3','user4','user5','user6','user7','user8','user9',]
 
-bin/ycsb load hbase12 -P workloads/workloadb -threads 30 -p table=testTable -p columnfamily=cf -p recordcount=100000
+./bin/ycsb load hbase12 -P workloads/workloadb -threads 30 -p table=testTable2 -p columnfamily=col -p recordcount=100000
 如上压测的hbase表名是 testTable ，列族名是 cf ，用于压测的客户端线程数是30个，负载类型workloadb，压测数据100000例
 
-./bin/ycsb run hbase12 -P workloads/workloadc -threads 30 -p table=testTable -p hosts=localhost -p columnfamily=cf > ./my-results/run-hbase-c4
+./bin/ycsb run hbase12 -P workloads/workloadc -threads 30 -p table=testTable2 -p hosts=localhost -p columnfamily=cf > ./my-results/run-hbase-c4
 
 workloada：混合了50%的读和50%的写；
 workloadb：Read mostly workload，混合了95%的读和5%的写，该workload侧重于测试集群的读能力；
@@ -14,6 +15,8 @@ workloade：Short ranges，短范围scan，不同于随机读，每个测试线�
 workloadf：Read-modiy-wirte，读改写，客户端读出一个记录，修改它并将被修改的记录返回
 -target n 测试的目标吞吐；
 -threads n 指定用于测试的客户端线程数；
+
+
 =============================================
 =============================================
 =============================================
