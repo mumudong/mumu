@@ -3,36 +3,50 @@ exec $HBASE_HOME/bin/hbase shell <<EOF
 create 'test', {NAME => 't', VERSIONS => 1}  
 EOF  
 2.bin/hbase shell,这个就是常用的shell工具，运维常用的DDL和DML都会通过此进行，其具体实现（对hbase的调用）是用ruby写的
-
 3.bin/hbase hbck, 运维常用工具，检查集群的数据一致性状态，其执行是直接调用org.apache.hadoop.hbase.util.HBaseFsck中的main函数
-
 4.bin/hbase hlog, log分析工具，其执行是直接调用org.apache.hadoop.hbase.regionserver.wal.HLogPrettyPrinter中的main函数
-
 5.bin/hbase hfile， hfile分析工具，其执行是直接调用org.apache.hadoop.hbase.io.hfile.HFile中的main函数
-
 6.bin/hbase zkcli,查看/管理ZK的shell工具，很实用，经常用，比如你可以通过（get /IP/master）其得知当前的active master,可以通过（get /IP/root-region-server）得知当前root region所在的server，你也可以在测试中通过（delete /IP/rs/dwxx.yy.taobao），模拟regionserver与ZK断开连接，
 其执行则是调用了org.apache.zookeeper.ZooKeeperMain的main函数
-
 7.bin/hbase classpath 打印classpath
-
 8.bin/hbase version 打印hbase版本信息
-
 ===============
 首先，编写一个文本文件firsthbaseshell.txt：
-[plain] view plain copy 在CODE上查看代码片派生到我的代码片
+
+status 查看状态
+version 查看版本
+list
+list 'abc.*' #显示abc开头的表
+describe 'table_name'
+scan 'ns1:t1',{COLUMNS=>['c1','c2'],LIMIT=>10,STARTROW=>'xyz'}
+
+
 create 'test', 'cf'  
 list 'test'  
-put 'test', 'row1', 'cf:a', 'value1'  
-put 'test', 'row2', 'cf:b', 'value2'  
-put 'test', 'row3', 'cf:c', 'value3'  
-put 'test', 'row4', 'cf:d', 'value4'  
+put 'test', 'row1', 'cf:a', 'value1'
 scan 'test'  
 get 'test', 'row1'  
 disable 'test'  
-enable 'test'  
+enable 'test'
 exit
 2、在HBase shell中运行这个脚本：
 利用命令：hbase shell firstbaseshell.txt:
+
+更改表名
+
+//快照 这样试试，先建立个表自己测试下，可以的话在执行。
+
+需要开启快照功能，在hbase-site.xml文件中添加如下配置项：
+<property>
+<name>hbase.snapshot.enabled</name>
+<value>true</value>
+</property>
+//命令
+hbase shell> disable 'tableName'
+hbase shell> snapshot 'tableName', 'tableSnapshot'
+hbase shell> clone_snapshot 'tableSnapshot', 'newTableName'
+hbase shell> delete_snapshot 'tableSnapshot'
+hbase shell> drop 'tableName'
 ================================
 
 HBASE按单个Rowkey检索的效率是很高的，耗时在1毫秒以下，每秒钟可获取1000~2000条记录，不过非key列的查询很慢。
