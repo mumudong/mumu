@@ -55,12 +55,16 @@ def d3():
     # 获得每个面的顶点
     poly3d = [[verts[vert_id] for vert_id in face] for face in faces]
     # print(poly3d)
-
+    # aa = (1,2,3,4)
+    # print(aa)
+    print('*verts------>',*verts)
+    print('verts------>',verts)
     # 绘制顶点
+    # 在函数调用中使用*list/tuple的方式表示将list/tuple分开，作为位置参数传递给对应函数（前提是对应函数支持不定个数的位置参数）
     x, y, z = zip(*verts)
     ax.scatter(x, y, z)
     # 绘制多边形面
-    ax.add_collection3d(Poly3DCollection(poly3d, facecolors='b', linewidths=1, alpha=0.02))
+    ax.add_collection3d(Poly3DCollection(poly3d, facecolors='b', linewidths=2, alpha=0.5))
     # ax.add_collection3d(Line3DCollection(poly3d, colors='k', linewidths=0.5, linestyles=':'))
 
     # 设置图形坐标范围
@@ -93,7 +97,7 @@ def d4():
 
 if __name__ == '__main__':
     # d1()
-    # d2()
+    d2()
     # d3()
-    d4()
+    # d4()
     print('ok')
