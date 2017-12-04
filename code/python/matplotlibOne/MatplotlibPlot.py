@@ -32,6 +32,11 @@ plt.figure('data & model')
 plt.plot(x,y,'k',lw=3)
 
 #scatter可以更容易的生成散点图
+'''
+matplotlib.pyplot.scatter(x, y, s=20, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None, alpha=None, linewidths=None, verts=None, hold=None,**kwargs)，
+其中，xy是点的坐标，s点的大小，maker是形状可以maker=（5，1）5表示形状是5边型，1表示是星型（0表示多边形，2放射型，3圆形）；
+alpha表示透明度；facecolor=‘none’表示不填充。
+'''
 plt.scatter(x,y_data)
 
 plt.savefig('result.png')
