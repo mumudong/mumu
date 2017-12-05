@@ -40,3 +40,6 @@ pos[:, :, 0] = x; pos[:, :, 1] = y
 rv = st.multivariate_normal([0, 0], [[1, 0], [0, 1]])
 plt.contourf(x, y, rv.pdf(pos))
 plt.show()
+
+
+
