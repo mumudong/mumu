@@ -1,4 +1,14 @@
-
+vi /etc/yum.repos.d/mongodb-3.4.repo
+    [mongodb-org-3.4]
+    name=MongoDB Repository
+    baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.4/x86_64/
+    gpgcheck=0
+    enabled=1
+    gpgkey=https://www.mongodb.org/static/pgp/server-3.2.asc
+mongodb配置
+    https://docs.mongodb.com/manual/reference/configuration-options/
+============================================
+============================================
 mongodb开机服务
 mongod.exe --bind_ip yourIPadress --logpath "E:\home\mongodb\mongodb.log" --logappend ^
 --dbpath "E:\home\mongodb" --port 27017 --serviceName "mu_mongodb" ^

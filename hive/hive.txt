@@ -1,6 +1,11 @@
 hive中四个hook
 使用hive.semantic.analyzer.hook
 可以控制权限。
+ set system:user.name=hive;
+
+
+
+
 
 ALTER TABLE foo
     SET FILEFORMAT 

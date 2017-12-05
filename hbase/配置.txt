@@ -5,7 +5,21 @@ create 'test', 'col', SPLITS => ['user1', 'user2','user3','user4','user5','user6
 ./bin/ycsb load hbase12 -P workloads/workloadb -threads 30 -p table=testTable2 -p columnfamily=col -p recordcount=100000
 如上压测的hbase表名是 testTable ，列族名是 cf ，用于压测的客户端线程数是30个，负载类型workloadb，压测数据100000例
 
-./bin/ycsb run hbase12 -P workloads/workloadc -threads 30 -p table=testTable2 -p hosts=localhost -p columnfamily=cf > ./my-results/run-hbase-c4
+
+
+
+
+
+10000个线程，100000条数据
+./bin/ycsb run hbase12 -P workloads/workloadc -threads 10000 -p table=testTable2  -p columnfamily=col > ./my-results/table1-t10000-get
+
+
+
+
+
+
+
+
 
 workloada：混合了50%的读和50%的写；
 workloadb：Read mostly workload，混合了95%的读和5%的写，该workload侧重于测试集群的读能力；

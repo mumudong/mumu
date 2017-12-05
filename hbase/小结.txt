@@ -20,7 +20,7 @@ list 'abc.*' #显示abc开头的表
 describe 'table_name'
 scan 'ns1:t1',{COLUMNS=>['c1','c2'],LIMIT=>10,STARTROW=>'xyz'}
 
-
+ create 'test', 'col', SPLITS => ['user1', 'user2','user3','user4','user5','user6','user7','user8','user9',]
 create 'test', 'cf'  
 list 'test'  
 put 'test', 'row1', 'cf:a', 'value1'
