@@ -51,3 +51,27 @@ where t1.question_id=t2.id;
  INSERT INTO "public".baidu_news(id, label) VALUES('2077','1')
  ON CONFLICT ( id )
 do UPDATE SET label = EXCLUDED.label;
+===================
+CREATE TABLE "public"."baidu_news_predict" (
+"id" int8 DEFAULT nextval('baidu_news_predict_id_seq'::regclass) NOT NULL,
+"createtime" timestamp(6),
+"content" text COLLATE "default",
+"intro" varchar(255) COLLATE "default",
+"keyword" text COLLATE "default",
+"label" varchar(255) COLLATE "default",
+"source" varchar(255) COLLATE "default",
+"time" varchar(255) COLLATE "default",
+"title" varchar(255) COLLATE "default",
+"url" text COLLATE "default",
+"website" varchar(255) COLLATE "default",
+"modifiedtime" timestamp(6) DEFAULT (now() + '08:00:00'::interval),
+CONSTRAINT "baidu_news_predict_pkey" PRIMARY KEY ("id")
+)
+WITH (OIDS=FALSE);
+
+ALTER TABLE "public"."baidu_news_predict" OWNER TO "TXDB";
+
+CREATE TRIGGER "t_predict" BEFORE UPDATE ON "public"."baidu_news_predict"
+FOR EACH ROW
+EXECUTE PROCEDURE "upd_timestamp"();
+=====================================

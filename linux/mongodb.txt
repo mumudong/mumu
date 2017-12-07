@@ -1,3 +1,4 @@
+yum安装mongodb:
 vi /etc/yum.repos.d/mongodb-3.4.repo
     [mongodb-org-3.4]
     name=MongoDB Repository
@@ -7,6 +8,7 @@ vi /etc/yum.repos.d/mongodb-3.4.repo
     gpgkey=https://www.mongodb.org/static/pgp/server-3.2.asc
 mongodb配置
     https://docs.mongodb.com/manual/reference/configuration-options/
+robo 3t可视化客户端
 ============================================
 ============================================
 mongodb开机服务

@@ -1,0 +1,19 @@
+---->schema.xml
+表权限
+    insert,update,select,delete
+       <schema name="TESTDB" dml="0110" >
+
+    writeType="0"   --写操作只写入一个节点
+    balance=0,1,2,3  --是否启用读写分离。
+    0：为不启用读写分离；1：为启用读写分离，只有非写入主库的其他库分担读请求，常用配置；
+    2：为所有读操作都随机在主从节点分发；3：为只在readhost上分发读操作负载，不在writehost上分担负载；
+
+
+
+
+
+
+
+
+
+

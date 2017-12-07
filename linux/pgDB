@@ -1,0 +1,90 @@
+txdb1 123456
+管理员密码$$1imadmin6@
+
+./pg_ctl restart -D ../data/ &
+
+$txbi2017\^\^
+
+\du; 查看用户及权限
+create user txbi with superuser password 'txbipg';
+
+性能测试及调优：
+
+初始化数据库
+    ./pgbench -i -s 20 test -U txdb_bi
+测试 1---->
+	模拟20个并发用户，每个用户执行2000次事务。每种配置参数执行三次，记录TPS值。
+[txdb@hdf-3 bin]$ ./pgbench -t 2000 -c 20 -U txdb_bi test
+    starting vacuum...end.
+    transaction type: TPC-B (sort of)
+    scaling factor: 20
+    query mode: simple
+    number of clients: 20
+    number of threads: 1
+    number of transactions per client: 2000
+    number of transactions actually processed: 40000/40000
+    latency average: 0.000 ms
+    tps = 14458.676200 (including connections establishing)
+    tps = 14466.893004 (excluding connections establishing)
+注:TPS (transaction per second)
+
+测试 2---->
+	模拟80个并发用户，每个用户执行2000次事务。每种配置参数执行三次，记录TPS值。
+[txdb@hdf-3 bin]$ ./pgbench -t 2000 -c 80 -U txdb_bi test
+    starting vacuum...end.
+    transaction type: TPC-B (sort of)
+    scaling factor: 20
+    query mode: simple
+    number of clients: 80
+    number of threads: 1
+    number of transactions per client: 2000
+    number of transactions actually processed: 160000/160000
+    latency average: 0.000 ms
+    tps = 18118.180133 (including connections establishing)
+    tps = 18121.388063 (excluding connections establishing)
+
+测试 3---->
+	模拟80个并发用户，20个线程，每个用户执行2000次事务。每种配置参数执行三次，记录TPS值。
+[txdb@hdf-3 bin]$ ./pgbench -t 2000 -c 80 -j 20 -U txdb_bi test
+    starting vacuum...end.
+    transaction type: TPC-B (sort of)
+    scaling factor: 20
+    query mode: simple
+    number of clients: 80
+    number of threads: 20
+    number of transactions per client: 2000
+    number of transactions actually processed: 160000/160000
+    latency average: 0.000 ms
+    tps = 28932.307442 (including connections establishing)
+    tps = 28953.063817 (excluding connections establishing)
+
+测试 4---->
+	模拟200个并发用户，20个线程，每个用户执行2000次事务。每种配置参数执行三次，记录TPS值。
+[txdb@hdf-3 bin]$ ./pgbench -t 2000 -c 200 -j 20 -U txdb_bi test
+   starting vacuum...end.
+   transaction type: TPC-B (sort of)
+   scaling factor: 20
+   query mode: simple
+   number of clients: 200
+   number of threads: 20
+   number of transactions per client: 2000
+   number of transactions actually processed: 400000/400000
+   latency average: 0.000 ms
+   tps = 24477.088313 (including connections establishing)
+   tps = 24483.720066 (excluding connections establishing)
+
+测试 5---->
+	模拟200个并发用户，100个线程，每个用户执行2次事务。每种配置参数执行三次，记录TPS值。
+[txdb@hdf-3 bin]$ ./pgbench -t 200 -c 200 -j 100 -U txdb_bi test
+[txdb@hdf-3 bin]$  ./pgbench -t 200 -c 200 -j 100 -U txdb_bi test
+    starting vacuum...end.
+    transaction type: TPC-B (sort of)
+    scaling factor: 20
+    query mode: simple
+    number of clients: 200
+    number of threads: 100
+    number of transactions per client: 200
+    number of transactions actually processed: 40000/40000
+    latency average: 0.000 ms
+    tps = 25448.060826 (including connections establishing)
+    tps = 25628.392815 (excluding connections establishing)
