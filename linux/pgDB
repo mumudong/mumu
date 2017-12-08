@@ -7,7 +7,73 @@ $txbi2017\^\^
 
 \du; 查看用户及权限
 create user txbi with superuser password 'txbipg';
+主从复制-读写分离：
+    主服务器
+        先创建一个新目录：
+            mkdir /opt/pgsql/pg_archive
+        首先需要创建一个数据库用户进行主从同步。创建用户replica，并赋予登录和复制的权限。
+            postgres# CREATE ROLE replica login replication encrypted password 'replica'
+        在pg_hba.conf里增加两行：
+            host     all             all          192.168.20.94/32          trust   #允许94连接到主服务器
+            host   replication      replica       192.168.20.94/32          md5   #允许94使用replica用户来复制
+        修改postgresql.conf
+            listen_addresses = '*'   # 监听所有IP
+            archive_mode = on  # 允许归档
+            archive_command = 'cp %p /opt/pgsql/pg_archive/%f'  # 用该命令来归档logfile segment
+            wal_level = hot_standby
+            max_wal_senders = 32 # 这个设置了可以最多有几个流复制连接，差不多有几个从，就设置几个wal_keep_segments = 256 ＃ 设置流复制保留的最多的xlog数目
+            wal_sender_timeout = 60s ＃ 设置流复制主机发送数据的超时时间
+            max_connections = 100 # 这个设置要注意下，从库的max_connections必须要大于主库的
+        配置完两个文件后重启服务器。
+            pg_ctl stop -D /opt/pgsql/data
+            pg_ctl start -D /opt/pgsql/data
+从服务器：
+        从主节点拷贝数据到从节点
+            su - postgres
+            rm -rf /opt/pgsql/data/*   #先将data目录下的数据都清空
+            pg_basebackup -h 192.168.20.93 -U replica -D /opt/pgsql/data -X stream -P  # 从93拷贝数据到94（基础备份）
+            mkdir /opt/pgsql/pg_archive
+        配置recovery.conf
+            复制/usr/pgsql-9.4/share/recovery.conf.sample 到 /opt/pgsql/data/recovery.conf
+                cp /usr/pgsql-9.4/share/recovery.conf.sample /opt/pgsql/data/recovery.conf
+            修改recovery.conf
+                standby_mode = on    # 说明该节点是从服务器
+                primary_conninfo = 'host=192.168.20.93 port=5432 user=replica password=replica'  # 主服务器的信息以及连接的用户
+                recovery_target_timeline = 'latest'
+            配置postgresql.conf
+                wal_level = hot_standby
+                max_connections = 1000 ＃ 一般查多于写的应用从库的最大连接数要比较大
+                hot_standby = on ＃ 说明这台机器不仅仅是用于数据归档，也用于数据查询
+                max_standby_streaming_delay = 30s # 数据流备份的最大延迟时间
+                wal_receiver_status_interval = 10s # 多久向主报告一次从的状态，当然从每次数据复制都会向主报告状态，这里只是设置最长的间隔时间
+                hot_standby_feedback = on # 如果有错误的数据复制，是否向主进行反馈
+            配置完后重启从服务器
+                pg_ctl stop -D /opt/pgsql/data
+                pg_ctl start -D /opt/pgsql/data
 
+
+3. 验证是否部署成功
+
+在主节点上执行：
+
+select client_addr,sync_state from pg_stat_replication;
+结果如下：
+
+postgres=# select client_addr,sync_state from pg_stat_replication;
+  client_addr  | sync_state
+---------------+------------
+ 192.168.20.94 | async
+(1 行记录)
+说明94是从服务器，在接收流，而且是异步流复制。
+
+此外，还可以分别在主、从节点上运行 ps aux | grep postgres 来查看进程：
+
+
+
+
+
+
+===========================================
 性能测试及调优：
 
 初始化数据库
