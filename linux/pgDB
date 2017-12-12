@@ -70,9 +70,63 @@ postgres=# select client_addr,sync_state from pg_stat_replication;
 
 
 
+===========================================
+测试:
+-->:
+    mysqlslap -hhdf-3 -P8066 --concurrency=1000 --iterations=1 --create-schema='TESTZB' --query='select * from pgbench_accounts where aid='9';' --number-of-queries=10000 --debug-info -uroot -p123456
+性能测试及调优：
+
+初始化数据库
+    ./pgbench -i -s 20 test -U txdb_bi
+测试 1---->
+	模拟20个并发用户，每个用户执行2000次事务。每种配置参数执行三次，记录TPS值。
+[txdb@hdf-3 bin]$ ./pgbench -t 2000 -c 20 -U txdb_bi test
+    starting vacuum...end.
+    transaction type: TPC-B (sort of)
+    scaling factor: 20
+    query mode: simple
+    number of clients: 20
+    number of threads: 1
+    number of transactions per client: 2000
+    number of transactions actually processed: 40000/40000
+    latency average: 0.000 ms
+    tps = 14458.676200 (including connections establishing)
+    tps = 14466.893004 (excluding connections establishing)
+注:TPS (transaction per second)
+
+sysbench下载
+http://imysql.com/wp-content/uploads/2014/09/sysbench-0.4.12-1.1.tgz
+cd /tmp/sysbench-0.4.12-1.1
+./autogen.sh
+./configure --with-mysql-includes=/usr/local/mysql/include --with-mysql-libs=/usr/local/mysql/lib && make
+
+# 如果 make 没有报错，就会在 sysbench 目录下生成二进制命令行工具 sysbench
+ls -l sysbench
+-rwxr-xr-x 1 root root 3293186 Sep 21 16:24 sysbench
+mysqladmin -u root -p123456 create sbtest
+
+./sysbench --mysql-host=hdf-1 --mysql-port=3306 --mysql-user=root --mysql-password=root123 \
+ --test=tests/db/oltp.lua --oltp_tables_count=10 --oltp-table-size=100000 --rand-init=on prepare
+        --test=tests/db/oltp.lua 表示调用 tests/db/oltp.lua 脚本进行 oltp 模式测试
+        --oltp_tables_count=10 表示会生成 10 个测试表
+        --oltp-table-size=100000 表示每个测试表填充数据量为 100000
+        --rand-init=on 表示每个测试表都是用随机数据来填充的
 
 
+/sysbench --mysql-host=hdf-1 --mysql-port=3306 --mysql-user=root \
+--mysql-password=root123 --test=tests/db/oltp.lua --oltp_tables_count=10 \
+--oltp-table-size=10000000 --num-threads=8 --oltp-read-only=true \
+--report-interval=10 --rand-type=uniform --max-time=3600 \
+ --max-requests=0 --percentile=99 run >> ./log/sysbench_oltpX_8_20140921.log
 
+        --num-threads=8 表示发起 8个并发连接
+        --oltp-read-only=off 表示不要进行只读测试，也就是会采用读写混合模式测试
+        --report-interval=10 表示每10秒输出一次测试进度报告
+        --rand-type=uniform 表示随机类型为固定模式，其他几个可选随机模式：uniform(固定),gaussian(高斯),special(特定的),pareto(帕累托)
+        --max-time=120 表示最大执行时长为 120秒
+        --max-requests=0 表示总请求数为 0，因为上面已经定义了总执行时长，所以总请求数可以设定为 0；也可以只设定总请求数，不设定最大执行时长
+        --percentile=99 表示设定采样比例，默认是 95%，即丢弃1%的长请求，在剩余的99%里取最大值
+        即：模拟 对10个表并发OLTP测试，每个表1000万行记录，持续压测时间为 1小时。
 ===========================================
 性能测试及调优：
 
