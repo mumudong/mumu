@@ -60,8 +60,8 @@ l0 = arange(6).reshape((2,3))
 l1 = arange(6,12).reshape((2,3))
 print('\n列扩展vstack((l0,l1))---->\n',vstack((l0,l1))) #垂直扩展
 print('\n行扩展hstack((l0,l1))---->\n',hstack((l0,l1))) #水平扩展
-print('\n列扩展concatenate((l0,l1))---->\n',concatenate((l0,l1)))
-print('\n行扩展concatenate((l0,l1),axis=1)---->\n',concatenate((l0,l1),axis=1))
+print('\n按行拼接，列扩展concatenate((l0,l1))---->\n',concatenate((l0,l1)))
+print('\n按列拼接，行扩展concatenate((l0,l1),axis=1)---->\n',concatenate((l0,l1),axis=1))
 print('\nz轴扩展stack((l0,l1))---->\n',stack((l0,l1)))
 
 s = stack((l0,l1))
