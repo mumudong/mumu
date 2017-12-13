@@ -3,6 +3,8 @@ Pandas  #科学计算库
 pip install SciPy #学习
 pip install Matplotlib #绘图库
 pip install Scikit-Learn #为适应大规模数据开发的 Scikit-Learn 机器学习算法库
+http://lib.csdn.net/article/machinelearning/62739
+
 pip install Theano #深度学习库
 MysqlDb
 WxPython #GUI图形界面库
