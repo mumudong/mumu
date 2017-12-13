@@ -21,19 +21,21 @@ o = 3*np.array([[1, 0],
                 [0, 1]])
 
 pos = np.concatenate((np.expand_dims(X,axis=2),np.expand_dims(Y,axis=2)),axis=2)
-print('X---->\n',X)
-print('expend---->\n',np.expand_dims(X,axis=2))
-print(X.shape,np.expand_dims(X,axis=2).shape,pos.shape)
-
-a = (pos-u).dot(np.linalg.inv(o))
-b = np.expand_dims(pos-u,axis=3)
+print('pos.shape---->\n',pos.shape)
+print('a.shape---->\n',u.shape)
+print('np.linalg.inv(o)---->\n',np.linalg.inv(o))
+a = (pos-u).dot(np.linalg.inv(o)) # pos每个元素减1，矩阵乘o的逆矩阵,(200,200,2)
+print('a.shape---->\n',a.shape)
+b = np.expand_dims(pos-u,axis=3) # 维度变为(200,200,2,1)
+print('b[1,1]---->\n',b[1,1])
 Z = np.zeros((num,num), dtype=np.float32)
 for i in range(num):
     Z[i] = [np.dot(a[i,j],b[i,j]) for j in range(num)]
+print('Z.shape---->',Z.shape,'----',Z[1].shape,'\nZ[1]---->\n',Z[1])
 Z = np.exp(Z*(-0.5))/(2*np.pi*np.linalg.det(o))
 fig = plt.figure()
 ax = fig.add_subplot(111,projection='3d')
-ax.plot_surface(X, Y, Z, rstride=5, cstride=5, alpha=0.7, cmap=cm.coolwarm)
+ax.plot_surface(X, Y, Z, rstride=10, cstride=10, alpha=0.7, cmap=cm.winter)
 
 cset = ax.contour(X,Y,Z,10,zdir='z',offset=0,cmap=cm.coolwarm)
 cset = ax.contour(X, Y, Z, zdir='x', offset=-5,cmap=mpl.cm.winter)
@@ -49,3 +51,5 @@ ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 plt.show()
+
+

@@ -72,3 +72,11 @@ print('转置---------->\n',u) # z轴第一层矩阵转置
 print('rot90(u,k=1,axes=(0,1))---------->\n',rot90(u,k=1,axes=(0,1))) # 矩阵元素旋转90度，和空间坐标无关，只是调换矩阵元素位置,由下箭头向右箭头转
 print('flip(u,1)--------->\n',flip(u,1)) #沿纵轴空翻
 print('roll(u,1,axis=0)----->\n',roll(u,1,axis=0)) #沿横轴滚动一次，从上向下滚
+
+a = numpy.arange(18).reshape((3,3,2))
+print('a---->\n',a)
+b = numpy.array([2,1])
+print('a-b---->\n',a-b)
+c = numpy.array([1,1,1,1]).reshape((2,2))
+print('a.dot(c)---->\n',a.dot(c))
+
