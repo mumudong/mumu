@@ -1,19 +1,13 @@
-from sklearn import datasets
-from sklearn.model_selection import cross_val_predict
-from sklearn import linear_model
-import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot
+from sklearn import svm
+np.random.seed(8) # 保证随机的唯一性
+# 线性可分：
+array = np.random.randn(20,2)
+X = np.r_[array-[3,3],array+[3,3]]
+y = [0]*20+[1]*20
+print(X[0])
+print(X[20],X.shape)
+print(y)
 
-lr = linear_model.LinearRegression()
-boston = datasets.load_boston()
-y = boston.target
 
-# cross_val_predict returns an array of the same size as `y` where each entry
-# is a prediction obtained by cross validation:
-predicted = cross_val_predict(lr, boston.data, y, cv=10)
-
-fig, ax = plt.subplots()
-ax.scatter(y, predicted, edgecolors=(0, 0, 0))
-ax.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=4)
-ax.set_xlabel('Measured')
-ax.set_ylabel('Predicted')
-plt.show()

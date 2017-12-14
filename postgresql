@@ -75,3 +75,13 @@ CREATE TRIGGER "t_predict" BEFORE UPDATE ON "public"."baidu_news_predict"
 FOR EACH ROW
 EXECUTE PROCEDURE "upd_timestamp"();
 =====================================
+\du; 查看用户及权限
+CREATE ROLE replica login replication encrypted password 'replica'
+
+mysqlslap -hhdf-3 -P8066 --concurrency=1000 --iterations=1 --create-schema='TESTZB' --query='select * from pgbench_accounts where aid='9';' --number-of-queries=10000 --debug-info -uroot -p123456
+
+mysqlslap -hhdf-3 -P8066 --concurrency=200 --iterations=1 --create-schema='txnc' --query="select * from antifraud_user where code='66027707';" --number-of-queries=10000 -uroot -p123456
+
+
+\c txnc;
+alter table up_bd_psndoc alter dataoriginflag type numeric(38,0) using dataoriginflag::numeric(38,0);
