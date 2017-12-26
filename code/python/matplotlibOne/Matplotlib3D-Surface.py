@@ -32,7 +32,10 @@ def d1():
 def d2():
     fig = plt.figure()
     ax = Axes3D(fig)
-    rv = stats.multivariate_normal([0, 0], cov=1)
+    # n为数据维度，mean 1*n数组，cov n*n数组
+    #  cov=[[1,0],[0,100]]对角线协方差说明是沿着单一坐标轴
+    rv = stats.multivariate_normal(mean=[0, 0], cov=[[2,1],[1,2]])
+    print(rv.mean)
     x, y = np.mgrid[-3:3:.15, -3:3:.15]
     ax.plot_surface(x, y, rv.pdf(np.dstack((x, y))), rstride=1, cstride=1)
     ax.set_zlim(0, 0.2)
