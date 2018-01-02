@@ -84,7 +84,7 @@ xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
 
 # Plot the decision boundary. For that, we will assign a color to each
 # point in the mesh [x_min, x_max]x[y_min, y_max].
-# numpy.ravel()展开元素到1维，并排序，类似flatten（不对原来数组产生影响）
+# numpy.ravel()展开元素到1维,默认按行，类似flatten（不对原来数组产生影响）
 print(xx.shape,xx.ravel().shape)
 Z = clf.predict(np.c_[xx.ravel(), yy.ravel()]) # 按列拼接
 # Put the result into a color plot

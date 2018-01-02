@@ -33,10 +33,12 @@ xx1, xx2 = np.meshgrid(np.linspace(x1_min, x1_max), np.linspace(x2_min, x2_max))
 print('xx1.shape---->\n',xx1.shape)
 # 得到向量w  : w_0 x_1 + w_1 x_2 + b = 0
 w = clf.coef_[0]  # coef系数向量
-f = w[0]*xx1 + w[1]*xx2 + clf.intercept_[0]+1  # 加1后才可绘制 -1 的等高线 [-1,0,1] + 1 = [0,1,2]
-plt.contour(xx1, xx2, f, [0,1,2], colors = 'r') # 绘制分隔超平面、H1、H2
+print('clf.coef_ ---->',clf.coef_,clf.coef_.shape)
+print('w---->',w)
+f = w[0]*xx1 + w[1]*xx2 + clf.intercept_[0]  # 加1后才可绘制 -1 的等高线 [-1,0,1] + 1 = [0,1,2]
+plt.contour(xx1, xx2, f, [-1,0,1], colors = 'r') # 绘制分隔超平面、H1、H2
 plt.scatter(X[:,0],X[:,1],c=y,cmap=plt.cm.Paired)
-plt.scatter(clf.support_vectors_[:,0],clf.support_vectors_[:,1],color='k') # 绘制支持向量点
+plt.scatter(clf.support_vectors_[:,0],clf.support_vectors_[:,1],color='blue',s=100) # 绘制支持向量点
 plt.show()
 
 
