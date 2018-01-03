@@ -50,7 +50,7 @@ spark特征选择常用工具:
             output.show(false)
         VectorSlicer
             切片工具，和VectorAssembler相对应，它的作用就是将一个向量切片，选择向量的子集。它提供了两种切片方式。
-                setIndices(), 按照向量的下标索引切片（从0开始）
+                setIndices(), 按照向量的下标索引切片(从0开始)
                 setNames()，按照列名切片
                 val data = Array(Row(Vectors.dense(-2.0, 2.3, 0.0)))
                 val defaultAttr = NumericAttribute.defaultAttr
