@@ -11,3 +11,5 @@ $ ./bin/spark-submit --class org.apache.spark.examples.SparkPi \
     --queue thequeue \
     lib/spark-examples*.jar \
     10
+
+nohup spark-submit  --master spark://hxf:7077  --executor-memory 30G --executor-cores 24  --conf spark.default.parallelism=300 --class com.analysis.main.GenAppInfo  /home/hadoop/jar/analysis.jar $dst_date > /home/hadoop/logs/genAppInfo.log &
