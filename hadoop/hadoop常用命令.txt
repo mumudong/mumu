@@ -136,6 +136,7 @@ grep 'MISSING' fsck.out
 •      hadoop job -list
 • 杀掉 Job
 •      hadoop  job –kill
+        yarn application -kill application_1497248309313_0493
 •指定路径下查看历史日志汇总
 •      hadoop job -history output-dir
 $      bin/hadoop job -history all output-dir
