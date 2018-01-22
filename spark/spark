@@ -37,4 +37,4 @@ nohup spark-submit  --master spark://hxf:7077  --executor-memory 30G --executor-
     false
 
 yarn logs -applicationId application_1511334364226_0440
-yarn application -kill appid //appid
+yarn application -kill appid//appid
