@@ -1,5 +1,4 @@
-
-kafka常用命令：librdkafka C语言
+kafka常用命令：
 
 0.查看有哪些主题： ./kafka-topics.sh --list --zookeeper 127.0.0.1:2181
 
@@ -68,7 +67,7 @@ shutdown broker
 ./kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper localhost:2181 --group test-consumer-group --topic tx
 
 修改偏移量(进入zookeeper设置)
-set /consumers/test-consumer-group/offsets/tx/0 1442
+set /consumers/test-consumer-group/offsets/tx/0 500
  -------------------------------
  =============================
  ---------------------------------
