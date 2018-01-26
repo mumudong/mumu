@@ -2,8 +2,11 @@
 """
 tensor存储的数据用掉就会消失，Variable在模型训练迭代中是持久化的
 """
+import matplotlib.pyplot as plt
+import matplotlib.pylab as pylab
 from tensorflow.examples.tutorials.mnist import input_data
 from mnist import read_data_sets
+import numpy as np
 #加载数据
 mnist = read_data_sets("MNIST_data/",one_hot=True)
 # print(mnist.train.images.shape,mnist.train.labels.shape)
@@ -30,4 +33,17 @@ for i in range(1000):
 correct_prediction = tf.equal(tf.argmax(y,1),tf.argmax(y_,1))   # boolean
 accuray = tf.reduce_mean(tf.cast(correct_prediction,tf.float32)) #
 
-print(accuray.eval({x:mnist.test.images,y_:mnist.test.labels}))
+for i in range(0, len(mnist.test.images)):
+    result = sess.run(correct_prediction, feed_dict={x: np.array([mnist.test.images[i]]), y_: np.array([mnist.test.labels[i]])})
+    if not result:
+        print('预测的值是：',sess.run(y, feed_dict={x: np.array([mnist.test.images[i]]), y_: np.array([mnist.test.labels[i]])}))
+        print('实际的值是：',sess.run(y_,feed_dict={x: np.array([mnist.test.images[i]]), y_: np.array([mnist.test.labels[i]])}))
+        one_pic_arr = np.reshape(mnist.test.images[i], (28, 28))
+        pic_matrix = np.matrix(one_pic_arr, dtype="float")
+        plt.imshow(pic_matrix) # 热图，通过色差、亮度来分析数据，增加颜色标注  plt.colorbar(cax=None,ax=None,shrink=0.5)可设置Bar为一半长度。
+        pylab.show()
+        break
+
+# print(accuray.eval({x:mnist.test.images,y_:mnist.test.labels}))
+print("准确率---->",sess.run(accuray, feed_dict={x: mnist.test.images,
+                                    y_: mnist.test.labels}))
