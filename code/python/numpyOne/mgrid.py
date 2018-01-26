@@ -6,10 +6,9 @@ import mpl_toolkits.mplot3d.axes3d as p3
 import scipy.stats as st
 
 k,b=np.mgrid[1:3:8j,1:3:8j] # 1:3:3j分别代表1-3,4j是分割成四份
-# print(k)
-# print(b)
-f_kb=3*k**2+2*b+1
 print(k.shape)
+print(b.shape)
+f_kb=3*k**2+2*b+1
 # k.shape=1,-1  # 将3x3矩阵转为9x1列向量
 # b.shape=1,-1
 # f_kb.shape=1,-1 #统统转成9行1列
