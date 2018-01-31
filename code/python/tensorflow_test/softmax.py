@@ -20,6 +20,7 @@ b = tf.Variable(tf.zeros([10]))
 y = tf.nn.softmax(tf.matmul(x,W) + b)
 #cross-entropy交叉熵, Hy'(y) = -∑y'i * log(yi) ,y'是真实概率分布，y是预测的
 y_ = tf.placeholder(tf.float32,[None,10])
+# reduction_indices删掉的维度
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_* tf.log(y),
                                               reduction_indices=[1]))
 # 学习率0.5
