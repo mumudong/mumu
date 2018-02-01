@@ -20,9 +20,9 @@ b = tf.Variable(tf.zeros([10]))
 y = tf.nn.softmax(tf.matmul(x,W) + b)
 #cross-entropy交叉熵, Hy'(y) = -∑y'i * log(yi) ,y'是真实概率分布，y是预测的
 y_ = tf.placeholder(tf.float32,[None,10])
-# reduction_indices删掉的维度
+# reduction_indices删掉的维度,reduce_sum删除axis=1的维度，10 * 20的数据之后只剩下10行
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_* tf.log(y),
-                                              reduction_indices=[1]))
+                                              reduction_indices=[1]),reduction_indices=None)
 # 学习率0.5
 train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
 tf.global_variables_initializer().run() # 全局参数初始化器
@@ -30,7 +30,7 @@ tf.global_variables_initializer().run() # 全局参数初始化器
 for i in range(1000):
     batch_xs,batch_ys = mnist.train.next_batch(100)
     train_step.run({x:batch_xs,y_:batch_ys})
-
+# 比较输出的结果[长度为10的数组]，数组中最大值对应的下标。若axis=0则比较所有数组第一位最大值对应的行数...
 correct_prediction = tf.equal(tf.argmax(y,1),tf.argmax(y_,1))   # boolean
 accuray = tf.reduce_mean(tf.cast(correct_prediction,tf.float32)) #
 
