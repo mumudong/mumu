@@ -1,0 +1,66 @@
+ 进入文件夹
+git init
+ssh-keygen -t rsa -C "850886448@qq.com"
+ssh -T git@github.com
+git config --global user.name "mumudong"
+git config --global user.email "850886448@qq.com"
+git remote add origin git@github.com:mumudong/dubbo
+
+
+===============
+===============
+git clone "输入项目的clone地址"     --会多一个项目的文件夹,如：a
+cd  a
+git add .  （注：别忘记后面的.，此操作是把Test文件夹下面的文件都添加进来）
+git status
+git commit  -m  "提交信息"  （注：“提交信息”里面换成你需要，如“first commit”）
+git push -u origin master   （注：此操作目的是把本地仓库push到github上面，此步骤需要你输入帐号和密码）
+
+=============================
+eclipse上传git项目
+
+
+git log
+回退版本
+git reset  -–hard HEAD^ 那么如果要回退到上上个版本只需把HEAD^ 改成 HEAD^^ 以此类推
+
+
+在开源世界中，需用大量的程序员共同维护一个项目。也是需要使用分支，如Jquery。
+分支的基本操作
+基本操作有如下几个：
+1. 查看当前分支 （git branch）
+2. 创建分支 （git branch 分支名）
+3.切换分支（git checkout 分支名）
+4.分支上的常规操作
+5.分支的合并 （git checkout master + git merge 分支名）
+6.分支的删除（git branch -d 分支名）
+ 
+
+
+从 develop 分支建一个 feature 分支，并切换到 feature 分支
+	$ git checkout -b myfeature develop
+	Switched to a new branch "myfeature"
+
+合并feature 分支到 develop
+	$ git checkout develop
+	Switched to branch 'develop'
+	$ git merge --no-ff myfeature
+	Updating ea1b82a..05e9557
+	(Summary of changes)
+	$ git branch -d myfeature
+	Deleted branch myfeature
+	$ git push origin develop
+
+git有冲突
+  down下线上代码版本,抛弃本地的修改
+      git fetch --all
+      git reset --hard origin/master
+      git fetch
+  保留你本地的修改
+      git merge --abort
+      git reset --merge
+      合并后记得一定要提交这个本地的合并
+      然后在获取线上仓库
+      git pull
+
+
