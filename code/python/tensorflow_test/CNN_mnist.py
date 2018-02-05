@@ -5,8 +5,8 @@ mnist = read_data_sets("MNIST_data/",one_hot=True)
 sess = tf.InteractiveSession()
 
 def weight_variable(shape):
-    # 使用截断的正态分布给权重制造一些随机噪声来打破完全对称
-    initial = tf.truncated_normal(shape,stddev=0.1)
+    # 使用截断的正态分布给权重制造一些随机噪声来打破完全对称,截断分布是指，限制变量x 取值范围
+    initial = tf.truncated_normal(shape,stddev=0.1) # 产生正态分布的值与均值的差若大于两倍的标准差就重新生成
     return tf.Variable(initial)
 
 def bias_variable(shape):
@@ -52,5 +52,38 @@ h_pool2 = max_pool_2x2(h_conv2)
 # 经过前两次步长2x2的最大池化，边长只有1/4了，图片尺寸由28*28变为7*7
 # 第二个卷积核数量为64，输出tensor尺寸为 7*7*64.
 # 将其输出转为1D向量，然后链接一个全连接层，隐含节点为1024
+W_fc1 = weight_variable([7 * 7 * 64,1024])
+b_fc1 = bias_variable([1024])
+h_pool2_flat = tf.reshape(h_pool2,[-1,7*7*64])
+h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat,W_fc1) + b_fc1)
+
+#Dropout减轻过拟合
+keep_prob = tf.placeholder(tf.float32)
+h_fc1_drop = tf.nn.dropout(h_fc1,keep_prob)
+
+#将Dropout层的输出连接softmax层，得到最后的概率输出
+W_fc2 = weight_variable([1024,10])
+b_fc2 = bias_variable([10])
+y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop,W_fc2) + b_fc2)
+
+#损失函数cross_entropy,优化器Adam
+cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv),
+                                              reduction_indices=[1]))
+train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+correct_prediction = tf.equal(tf.argmax(y_conv,1),tf.arg_max(y_,1))
+accuracy = tf.reduce_mean(tf.cast(correct_prediction,tf.float32))
+
+tf.global_variables_initializer().run()
+for i in range(20000):  #20000次迭代训练
+    batch = mnist.train.next_batch(50) #大小为50的batch
+    if i%100 == 0:
+        train_accuracy = accuracy.eval(feed_dict={x:batch[0],y_:batch[1],
+                                                  keep_prob:1.0})
+        print("step %d,training accuracy %g"%(i,train_accuracy))
+    train_step.run(feed_dict={x:batch[0],y_:batch[1],keep_prob:0.5})
+
+print("test accuracy %g"%accuracy.eval(feed_dict={x:mnist.test.images,
+                                                   y_:mnist.test.labels,
+                                                   keep_prob:1.0}))
 
 
