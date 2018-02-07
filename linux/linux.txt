@@ -2,8 +2,10 @@ netstat -ano
         -tpl
 lsof -i:端口号
 
-
-
+两台机子A/B
+A:  nc -l 9999 在A机器上启动一个端口监听，比如 9999端口,默认tcp
+telnet B 9999测试连接
+nc -vzw 2 B 9998-9999  扫描两个端口
 
 command || { echo "command failed"; exit 1; }
 将一个已有用户 cnzhx 增加到一个已有用户组 apache 中，使此用户组成为该用户的附加用户组，可以使用带 -a 参数的 usermod  指令。-a 代表 append， 也就是将用户添加到新用户组中而不必离开原有的其他用户组。不过需要与 -G 选项配合使用：
