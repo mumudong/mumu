@@ -34,7 +34,8 @@ git reset  -–hard HEAD^ 那么如果要回退到上上个版本只需把HEAD^ 
 4.分支上的常规操作
 5.分支的合并 （git checkout master + git merge 分支名）
 6.分支的删除（git branch -d 分支名）
- 
+ git status
+ git diff
 
 
 从 develop 分支建一个 feature 分支，并切换到 feature 分支
@@ -51,6 +52,10 @@ git reset  -–hard HEAD^ 那么如果要回退到上上个版本只需把HEAD^ 
 	Deleted branch myfeature
 	$ git push origin develop
 
+
+
+
+
 git有冲突
   down下线上代码版本,抛弃本地的修改
       git fetch --all
@@ -62,5 +67,8 @@ git有冲突
       合并后记得一定要提交这个本地的合并
       然后在获取线上仓库
       git pull
-
+如果你觉得你合并后的状态是一团乱麻，想把当前的修改都放弃，你可以用下面的命令回到合并之前的状态：
+$ git reset --hard HEAD
+或者你已经把合并后的代码提交，但还是想把它们撒销：
+$ git reset --hard ORIG_HEAD
 
