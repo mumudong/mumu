@@ -27,7 +27,7 @@
 　　mysql -u root -p test<c:\test.txt
 　　
 　　3、创建临时表：(建立临时表zengchao)
-　　create temporary table zengchao(name varchar(10));
+　　create temporary table test(name varchar(10));
 　　
 　　4、创建表是先判断表是否存在
 　　create table if not exists students(……);
