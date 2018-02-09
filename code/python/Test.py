@@ -1,8 +1,11 @@
-y = [1] + [0] * 9
-x = [1] * 10
-def a(): # 返回 Tuple
-    return [x for _ in range(10)],[y for _ in range(10)]
-for t in a():
-    print(t)
-for (x,y) in zip(range(4),range(4)):
-    print(x,y)
+# import collections
+# a = ['we','are2','friend','we','are','are']
+# c = collections.Counter(a)
+# print(c)
+# d = dict()
+# for i in c:
+#     print(len(d),i)
+#     d[i]=len(d)
+# print(d)
+d = len("abc"),"def"
+print("%s," % ("12"))
