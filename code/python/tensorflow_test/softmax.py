@@ -1,5 +1,7 @@
 # --coding:utf-8--
 """
+回归用sigmoid
+分类用softmax
 tensor存储的数据用掉就会消失，Variable在模型训练迭代中是持久化的
 """
 import matplotlib.pyplot as plt
