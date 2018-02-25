@@ -1,6 +1,7 @@
 netstat -ano
         -tpl
 lsof -i:端口号
+查看显卡nvidia-smi
 
 两台机子A/B
 A:  nc -l 9999 在A机器上启动一个端口监听，比如 9999端口,默认tcp
