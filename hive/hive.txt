@@ -7,7 +7,9 @@ hive中四个hook
 Hive给出一种并非完美的解决方法就是可以自定义底层用什么字符来表示NULL。
 例如我想用字符'a'来表示NULL：
 hive> alter table ljn005 SET SERDEPROPERTIES('serialization.null.format' = 'a');
-
+alter table ljn005 SET SERDEPROPERTIES('field.delim'='\t');
+alter table tablename change column c_Old c_New int comment 'XXXXXX'
+after severity;//可以把该列放到指定列的后而，或者使用’first’放到第一位。
 
 ALTER TABLE foo
     SET FILEFORMAT 
