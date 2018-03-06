@@ -211,7 +211,7 @@ zooKeeperNamespace=hiveserver2 指定ZK中的nameSpace，即参数hive.server2.z
 beeline -u "jdbc:hive2://jfhadoop005:9501,jfhadoop006:9501,jfhadoop007:9501/ssjf;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2/ssjf;?mapreduce.job.queuename=root.ssfj" -n ssjf -pXXXX -d org.apache.hive.jdbc.HiveDriver
 --hiveconf property=value
 --hivevar name=value
-
+set  hive.plan.serialization.format=javaXML;序列化
 其中：
  -u   
    jfhadoop005:9501  三个zk的9501端口，轮询用
