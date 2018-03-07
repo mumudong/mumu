@@ -42,7 +42,12 @@ alter table  INDEX_PARAMS  modify column PARAM_VALUE  varchar(4000) character se
  
  
  
- 
+ add jar /usr/hdp/2.6.0.3-8/hive/aux_lib/fastjson-1.2.7.jar;
+ add jar /usr/hdp/2.6.0.3-8/hive/aux_lib/netty-all-4.1.16.Final.jar;
+ add jar /usr/hdp/2.6.0.3-8/hive/aux_lib/orgEncDecClinet-0.0.9.jar ;
+
+ create function jiami as 'com.nc.auth.EncodeNC' using jar 'hdfs://tianxi-ha/test/jar/original-authNc-0.0.1-SNAPSHOT.jar';
+
  
  
  
