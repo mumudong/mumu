@@ -5,21 +5,8 @@ create 'test', 'col', SPLITS => ['user1', 'user2','user3','user4','user5','user6
 ./bin/ycsb load hbase12 -P workloads/workloadb -threads 30 -p table=testTable2 -p columnfamily=col -p recordcount=100000
 如上压测的hbase表名是 testTable ，列族名是 cf ，用于压测的客户端线程数是30个，负载类型workloadb，压测数据100000例
 
-
-
-
-
-
 10000个线程，100000条数据
 ./bin/ycsb run hbase12 -P workloads/workloadc -threads 10000 -p table=testTable2  -p columnfamily=col > ./my-results/table1-t10000-get
-
-
-
-
-
-
-
-
 
 workloada：混合了50%的读和50%的写；
 workloadb：Read mostly workload，混合了95%的读和5%的写，该workload侧重于测试集群的读能力；
@@ -29,50 +16,4 @@ workloade：Short ranges，短范围scan，不同于随机读，每个测试线�
 workloadf：Read-modiy-wirte，读改写，客户端读出一个记录，修改它并将被修改的记录返回
 -target n 测试的目标吞吐；
 -threads n 指定用于测试的客户端线程数；
-
-
-=============================================
-=============================================
-=============================================
-=============================================
-
-hbase优化:
-    HBaseConfiguration conf = HBaseConfiguration.create();
-    HTable table1 = new HTable(conf, "myTable");
-    HTable table2 = new HTable(conf, "myTable");
-
-1、memstore大小、数量可以增加。特别是在大批量随机put的情况下
-2、storefile合并不要太频繁
-3、split需要减少，所以需要在put前与创建region（参照前面第一条）
-通过以上配置可以减小 tps波动，以及flush、compact、split造成的卡死
-
-linux打开文件数和打开进程数:
-    /etc/security/limits.conf
-    * soft nofile 102400
-    * hard nofile 409600
-
-手动合并-------------->:
-<property>
-    <name>hbase.hregion.majorcompaction</name>
-    <value>0</value>
-    <description>禁止majorcompaction，这里虽然禁止了，但是还是得做，是通过linux定时任务在空闲时间执行</description>
-</property>
-    cd /opt/hbase-1.2.1/bin
-    ./hbase shell
-    major_compact 'hbasetest'
-    quit
-
-设置分割时机------------------->:
-    <property>
-        <name>hbase.hregion.max.filesize</name>
-        <value>53687091200</value>
-        <description>设置每个数据表中单个region存储的hfile最大值50G，只有超过此值才做split</description>
-    </property>
-    <property>
-        <name>hbase.regionserver.region.split.policy</name>
-        <value>org.apache.hadoop.hbase.regionserver.ConstantSizeRegionSplitPolicy</value>
-        <description>这个需要和hbase.hregion.max.filesize结合使用</description>
-    </property>
-
-
 
