@@ -10,7 +10,7 @@ input {
 }
 
 output {
-    stdout {
+    stdout {ll
       codec => rubydebug
     }
     if [type] == "app-a" {
