@@ -1,11 +1,6 @@
 hive中四个hook
 使用hive.semantic.analyzer.hook
 可以控制权限。
- set system:user.name=hive;
-
-set hive.execution.engine=tez; 来启动Tez
-mapreduce.reduce.memory.mb=5120   //设置reduce container的内存大小
-mapreduce.reduce.java.opts=-Xms2000m -Xmx4600m; //设置reduce任务的JVM参数
 
 Hive给出一种并非完美的解决方法就是可以自定义底层用什么字符来表示NULL。
 例如我想用字符'a'来表示NULL：
