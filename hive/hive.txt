@@ -69,7 +69,7 @@ beeline -u jdbc:hive2://10.167.222.113:10000  -n tx_etl -p tx_etl
 
 
 Option Explicit  
-  
+
 Dim mdl ' the current model  
 Set mdl = ActiveModel  
 If (mdl Is Nothing) Then  
