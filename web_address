@@ -1,14 +1,14 @@
-http://www.tensorfly.cn/tfdoc/get_started/os_setup.html tensorflow
-https://www.cnblogs.com/wangxiaocvpr/p/5902086.html  tensorflow看看
-http://www.tensorfly.cn/tfdoc/get_started/basic_usage.html tensorflow中文社区,目标定位，计算距离，滑动验证码
-http://lib.csdn.net/ai/node/762   人工智能
-https://wenku.baidu.com/view/1627cd0a844769eae009edfe.html 智能制造
-http://git.oschina.net/search?utf8=%E2%9C%93&type=&search= 码云
-http://lib.csdn.net/computervison/node/831 人脸识别
-http://www.jianshu.com/p/cc680380ca34 azkaban安装
-http://azkaban.github.io/azkaban/docs/latest/#solo-setup
-http://www.linuxidc.com/Linux/2014-07/104448p2.htm ldap安装
-
+tensorflow ----》 http://www.tensorfly.cn/tfdoc/get_started/os_setup.html
+tensorflow看看 ----》 https://www.cnblogs.com/wangxiaocvpr/p/5902086.html
+tensorflow中文社区 ----》 http://www.tensorfly.cn/tfdoc/get_started/basic_usage.html ,目标定位，计算距离，滑动验证码
+人工智能 ----》 http://lib.csdn.net/ai/node/762
+智能制造 ----》 https://wenku.baidu.com/view/1627cd0a844769eae009edfe.html
+码云 ----》 http://git.oschina.net/search?utf8=%E2%9C%93&type=&search= 码云
+人脸识别 ----》 http://lib.csdn.net/computervison/node/831 人脸识别
+azkaban安装 ----》 http://www.jianshu.com/p/cc680380ca34
+            ----》 http://azkaban.github.io/azkaban/docs/latest/#solo-setup
+ldap安装 ----》 http://www.linuxidc.com/Linux/2014-07/104448p2.htm
+对抗神经网络 https://blog.csdn.net/Aliyun_PAI/article/details/77651800
 
 docker
 jsoup
