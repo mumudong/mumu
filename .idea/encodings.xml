@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/hadoop/kafka/kafka命令-spark命令.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/hadoop/kafka/新建文本文档.txt" charset="GBK" />
     <file url="file://$PROJECT_DIR$/hadoop/optimize.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/hadoop/sqoop/sqoop.txt" charset="GBK" />
     <file url="file://$PROJECT_DIR$/hadoop/新建文本文档.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/kafka/kafka命令-spark命令.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/kafka/新建文本文档.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/linux/ldap.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/linux/linux.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/linux/mongodb.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/linux/rsync.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/linux/sdkman.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/linux/交互命令expect.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/linux/网络.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/mysql/show.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/mysql/新建文本文档.txt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/sqoop/sqoop.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/linux/db/mongodb.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/linux/linux/ldap.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/linux/linux/linux.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/linux/linux/rsync.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/linux/linux/sdkman.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/linux/linux/交互命令expect.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/linux/linux/网络.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/linux/mysql/show.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/linux/mysql/新建文本文档.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/plan/web_address" charset="GBK" />
     <file url="file://$PROJECT_DIR$/suanfa/machine-learning/AssociationAnalysis/DataMining_Apriori/FrequentItem.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/web_address" charset="GBK" />
   </component>
 </project>

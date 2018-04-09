@@ -1,0 +1,119 @@
+Selenium（http://www.seleniumhq.org/）是一个强大的网络数据采集工具，最初是为网站自动化测试而开发的。近几年，
+它还被广泛用于获取精确的网站快照，因为它们可以直接运行在浏览器上。Selenium 可以让浏览器自动加载页面，获取需要的数据，
+甚至页面截屏，或者判断网站上某些动作是否发生。
+Selenium 自己不带浏览器，它需要与第三方浏览器结合在一起使用。例如，如果你在 Firefox 上运行 Selenium，可以直接看到
+ Firefox 窗口被打开，进入网站，然后执行你在代码中设置的动作。虽然这样可以看得更清楚，但是我更喜欢让程序在后台运行，
+ 所以我 PhantomJS（http://phantomjs.org/download.html）代替真实的浏览器。
+PhantomJS 是一个“无头”（headless）浏览器。它会把网站加载到内存并执行页面上的 JavaScript，但不会向用户展示网页的图形界面。
+将 Selenium 和 PhantomJS 结合在一起，就可以运行一个非常强大的网络爬虫了，可以处理 cookie、JavaScrip、header，
+以及任何你需要做的事情。
+可以从PyPI网站（https://pypi.python.org/simple/selenium/）下载Selenium库，也可以用第三方管理器（像pip）用命令行安装。
+
+
+
+
+
+1. 初始化环境
+[root@salt-node1 src]# vim /etc/sysctl.conf
+vm.max_map_count = 290000
+ 
+[root@salt-node1 src]#vim/etc/security/limits.conf 
+*        hard  nproc           20000
+*        soft  nproc           20000
+*        soft  nofile          290000
+*        hard  nofile          290000
+  
+[root@salt-node1 src]# cat /etc/security/limits.d/20-nproc.conf
+# Default limit for number of user's processes to prevent
+# accidental fork bombs.
+# See rhbz #432903 for reasoning.
+  
+*          soft    nproc    290000
+root       soft   nproc     unlimited
+  
+[root@salt-node1 src]# sysctl -p
+net.ipv4.ip_forward = 1
+vm.max_map_count = 290000
+[root@salt-node1 src]# su - java
+Last login: Sat Mar 18 00:40:54 CST 2017 on pts/1
+ 
+查看参数是否生效
+[java@salt-node1 ~]$ ulimit -n
+290000
+=========================================
+=========================================
+elastic search
+
+	与hbase整合
+	5.x以上版本不能用了./elasticsearch -Des.insecure.allow.root=true
+
+
+PUT /my_index
+{
+    "settings": {
+        "analysis": {
+            "analyzer": {
+                "my_html_analyzer": {
+                    "tokenizer":     "standard",
+                    "char_filter": [ "html_strip" ]
+                }
+            }
+        }
+    }
+}
+
+
+    groupadd elasticsearch
+    useradd elasticsearch -g elasticsearch
+    chown -R elasticsearch.elasticsearch /opt/elasticsearch-5.6.4/
+    4、给已有的用户增加工作组
+    usermod -G groupname username  （这个会把用户从其他组中去掉）
+    usermod -a groupname username
+
+    2、安装出现的错误一： max file descriptors [4096] for elasticsearch process likely too low, increase to at least [65536]
+    解决方法：切换到root用户，进入vi /etc/security/limits.conf
+        [plain] view plain copy
+        work soft nofile 819200
+        work hard nofile 819200
+    3、安装错误二： max number of threads [1024] for user [work] likely too low, increase to at least [2048]
+    解决方法：进入limits.d下的配置文件：vi /etc/security/limits.d/90-nproc.conf ，修改配置如下：
+        [plain] view plain copy
+        *          soft    nproc     1024
+        修改为：
+        *          soft    nproc     2048
+    4、安装错误三： max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]
+    解决方法：修改sysctl文件：vi /etc/sysctl.conf ，增加下面配置项：
+        [plain] view plain copy
+        增加改行配置：vm.max_map_count=655360
+        保存退出后，执行：
+        sysctl -p
+        sysctl -w vm.max_map_count=262144
+
+engix反向代理elasticsearch  http://blog.csdn.net/hereiskxm/article/details/47299543
+elasticsearch.yml
+     curl -XPUT -u elastic:changeme 'hadoop-5:9200/_xpack/security/user/elastic/_password' -d '{ "password" : "elastic" }'
+
+        cluster.name: es-tx
+        node.name: node1
+        bootstrap.memory_lock: false
+        bootstrap.system_call_filter: false
+        network.host: hadoop-5
+        http.port: 9200
+        node.master: true
+        node.data: true
+        path.data: /data/node1/es
+        path.logs: /data/node1/eslogs
+        discovery.zen.fd.ping_timeout: 100s
+        discovery.zen.minimum_master_nodes: 2
+        discovery.zen.ping_timeout: 100s
+        discovery.zen.ping.unicast.hosts: ["10.167.2222.105","10.167.222.106","10.167.222.107"]
+        http.cors.enabled: true
+        http.cors.allow-origin: "*"
+
+
+
+
+
+
+
+
