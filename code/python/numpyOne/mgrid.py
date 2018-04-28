@@ -24,6 +24,7 @@ x, y = np.mgrid[-1:1:.01, -1:1:.01] # .01表示步长，啥情况，和上面不
 # print(x)
 print((200,200)+(2,3) )  # (200, 200, 2, 3)
 pos = np.empty(x.shape + (2,)) # 创建相应维度的随机矩阵
+print('---->',np.empty(x.shape+(2,)).shape)
 # print(pos)
 pos[:, :, 0] = x
 pos[:, :, 1] = y
