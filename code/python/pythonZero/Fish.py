@@ -7,6 +7,8 @@ class Fish:
 class User:
     def __init__(self,name):
         self.name = name
+def impor():
+    print('import test')
 f = Fish()
 Fish.eat(f,None)
 print(f.hungry)

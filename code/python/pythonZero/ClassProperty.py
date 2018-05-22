@@ -3,8 +3,55 @@
 #    __dict__:用来存储属性的字典,使用点来访问属性本质.字典会占用大量内存,
 # x = 在需要管理一些资源比如文件
 # __slots__是什么:是一个类变量,变量值可以是列表,元祖,或者可迭代对象,也可以是一个字符串(意味着所有实例只有一个数据属性
+'''
+类的方法
+在类地内部，使用 def 关键字来定义一个方法，与一般函数定义不同，类方法必须包含参数 self, 且为第一个参数，self 代表的是类的实例。
+self 的名字并不是规定死的，也可以使用 this，但是最好还是按照约定是用 self
+
+__private_attrs：两个下划线开头，这种用法是为了避免与子类定义的名称冲突,类似final
+
+_单下划线私有方法 
+
+class people:  
+    name="tom"      #类属性:实例对象和类对象可以同时调用  
+    def  __init__(self,age):    #实例属性  
+        self.age=age 
+
+class people:  
+    name="tom"      #类属性:实例对象和类对象可以同时调用  
+    def  __init__(self,age):    #实例属性  
+        self.age=age  
+  
+p=people(18)    #实例对象  
+p.sex="男"       #实例属性  
+print(p.name)  
+print(p.age)    #实例属性是实例对象特有的，类对象不能拥有  
+print(p.sex)  
+print(people.name)  #类对象  
+# print(people.age)  #错误：实例属性，不能通过类对象调用  
+# print(people.sex)  #错误：实例属性，不能通过类对象调用
 
 
+类方法
+class people:  
+    country="china"  
+    @classmethod  
+    def getCountry(cls):  
+        return cls.country  
+p=people()  
+print(p.getCountry())   #实例对象调用类方法  
+print(people.getCountry())  #类对象调用类方法  
+
+
+
+
+
+
+
+
+
+
+'''
 
 
 #内置方法:

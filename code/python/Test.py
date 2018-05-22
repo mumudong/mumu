@@ -9,3 +9,4 @@
 # print(d)
 d = len("abc"),"def"
 print("%s," % ("12"))
+print(type(d))
