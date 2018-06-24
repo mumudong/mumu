@@ -167,7 +167,7 @@ less_value_features = []
 # 第一步，检查类别型变量中，哪些变量取值超过5
 for var in cat_features:
     valueCounts = len(set(trainData[var]))
-    print valueCounts
+    print(valueCounts)
     if valueCounts > 5:
         more_value_features.append(var)  #取值超过5的变量，需要bad rate编码，再用卡方分箱法进行分箱
     else:
@@ -179,14 +179,14 @@ var_bin_list = []   #由于某个取值没有好或者坏样本而需要合并�
 for col in less_value_features:
     binBadRate = BinBadRate(trainData, col, 'y')[0]
     if min(binBadRate.values()) == 0 :  #由于某个取值没有坏样本而进行合并
-        print '{} need to be combined due to 0 bad rate'.format(col)
+        print('{} need to be combined due to 0 bad rate'.format(col))
         combine_bin = MergeBad0(trainData, col, 'y')
         merge_bin_dict[col] = combine_bin
         newVar = col + '_Bin'
         trainData[newVar] = trainData[col].map(combine_bin)
         var_bin_list.append(newVar)
     if max(binBadRate.values()) == 1:    #由于某个取值没有好样本而进行合并
-        print '{} need to be combined due to 0 good rate'.format(col)
+        print('{} need to be combined due to 0 good rate'.format(col))
         combine_bin = MergeBad0(trainData, col, 'y',direction = 'good')
         merge_bin_dict[col] = combine_bin
         newVar = col + '_Bin'
@@ -218,7 +218,7 @@ file2.close()
 # （iii）对连续型变量进行分箱，包括（ii）中的变量
 continous_merged_dict = {}
 for col in num_features:
-    print "{} is in processing".format(col)
+    print("{} is in processing".format(col))
     if -1 not in set(trainData[col]):   #－1会当成特殊值处理。如果没有－1，则所有取值都参与分箱
         max_interval = 5   #分箱后的最多的箱数
         cutOff = ChiMerge(trainData, col, 'y', max_interval=max_interval,special_attribute=[],minBinPcnt=0)
