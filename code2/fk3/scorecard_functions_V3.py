@@ -13,7 +13,7 @@ def SplitData(df, col, numOfSplit, special_attribute=[]):
     if special_attribute != []:
         df2 = df.loc[~df[col].isin(special_attribute)]
     N = df2.shape[0]
-    n = N/numOfSplit
+    n = N//numOfSplit
     splitPointIndex = [i*n for i in range(1,numOfSplit)]
     rawValues = sorted(list(df2[col]))
     splitPoint = [rawValues[i] for i in splitPointIndex]
@@ -115,7 +115,7 @@ def ChiMerge(df, col, target, max_interval=5,special_attribute=[],minBinPcnt=0):
     colLevels = sorted(list(set(df[col])))
     N_distinct = len(colLevels)
     if N_distinct <= max_interval:  #如果原始属性的取值个数低于max_interval，不执行这段函数
-        print "The number of original levels for {} is less than or equal to max intervals".format(col)
+        print("The number of original levels for {} is less than or equal to max intervals".format(col))
         return colLevels[:-1]
     else:
         if len(special_attribute)>=1:

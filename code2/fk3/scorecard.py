@@ -12,11 +12,13 @@ from sklearn.linear_model import LogisticRegressionCV
 import statsmodels.api as sm
 from sklearn.ensemble import RandomForestClassifier
 from numpy import log
+import numpy as np
 from sklearn.metrics import roc_auc_score
+from scorecard_functions_V3 import *
 
 def CareerYear(x):
     #对工作年限进行转换
-    if x.find('n/a') > -1:
+    if x.find('n/a') > -1 or x.find('nan') > -1:
         return -1
     elif x.find("10+")>-1:   #将"10＋years"转换成 11
         return 11
@@ -74,10 +76,10 @@ def MakeupMissing(x):
 # 3，数据集划分成训练集和测试集
 
 
-folderOfData = 'C:/Users/OkO/Desktop/Financial Data Analsys/3nd Series/Data/'
+folderOfData = 'pickle文件'
 
 
-allData = pd.read_csv(folderOfData + 'application.csv',header = 0, encoding = 'latin1')
+allData = pd.read_csv('application.csv',header = 0, encoding = 'latin1')
 allData['term'] = allData['term'].apply(lambda x: int(x.replace(' months','')))
 
 # 处理标签：Fully Paid是正常用户；Charged Off是违约用户
@@ -94,11 +96,11 @@ allData1 = allData.loc[allData.term == 36]
 trainData, testData = train_test_split(allData1,test_size=0.4)
 
 #固化变量
-trainDataFile = open(folderOfData+'trainData.pkl','w')
+trainDataFile = open(folderOfData+'trainData.pkl','wb')
 pickle.dump(trainData, trainDataFile)
 trainDataFile.close()
 
-testDataFile = open(folderOfData+'testData.pkl','w')
+testDataFile = open(folderOfData+'testData.pkl','wb')
 pickle.dump(testData, testDataFile)
 testDataFile.close()
 
@@ -116,7 +118,7 @@ testDataFile.close()
 trainData['int_rate_clean'] = trainData['int_rate'].map(lambda x: float(x.replace('%',''))/100)
 
 # 将工作年限进行转化，否则影响排序
-trainData['emp_length_clean'] = trainData['emp_length'].map(CareerYear)
+trainData['emp_length_clean'] = trainData['emp_length'].astype(str).map(CareerYear)
 
 # 将desc的缺失作为一种状态，非缺失作为另一种状态
 trainData['desc_clean'] = trainData['desc'].map(DescExisting)
@@ -194,7 +196,7 @@ for col in less_value_features:
         var_bin_list.append(newVar)
 
 #保存merge_bin_dict
-file1 = open(folderOfData+'merge_bin_dict.pkl','w')
+file1 = open(folderOfData+'merge_bin_dict.pkl','wb')
 pickle.dump(merge_bin_dict,file1)
 file1.close()
 
@@ -210,7 +212,7 @@ for col in more_value_features:
     br_encoding_dict[col] = br_encoding['bad_rate']
     num_features.append(col+'_br_encoding')
 
-file2 = open(folderOfData+'br_encoding_dict.pkl','w')
+file2 = open(folderOfData+'br_encoding_dict.pkl','wb')
 pickle.dump(br_encoding_dict,file2)
 file2.close()
 
@@ -259,7 +261,7 @@ for col in num_features:
         var_bin_list.append(newVar)
     continous_merged_dict[col] = cutOff
 
-file3 = open(folderOfData+'continous_merged_dict.pkl','w')
+file3 = open(folderOfData+'continous_merged_dict.pkl','wb')
 pickle.dump(continous_merged_dict,file3)
 file3.close()
 
@@ -281,7 +283,7 @@ for var in all_var:
     IV_dict[var] = woe_iv['IV']
 
 
-file4 = open(folderOfData+'WOE_dict.pkl','w')
+file4 = open(folderOfData+'WOE_dict.pkl','wb')
 pickle.dump(WOE_dict,file4)
 file4.close()
 
@@ -353,7 +355,7 @@ multi_analysis_vars_1 = [high_IV_sorted[i][0]+"_WOE" for i in range(cnt_vars) if
 X = np.matrix(trainData[multi_analysis_vars_1])
 VIF_list = [variance_inflation_factor(X, i) for i in range(X.shape[1])]
 max_VIF = max(VIF_list)
-print max_VIF
+print(max_VIF)
 # 最大的VIF是1.32267733123，因此这一步认为没有多重共线性
 multi_analysis = multi_analysis_vars_1
 
@@ -384,9 +386,9 @@ while(len(varLargeP) > 0 and len(multi_analysis) > 0):
     # (1) 剩余所有变量均显著
     # (2) 没有特征可选
     varMaxP = varLargeP[0][0]
-    print varMaxP
+    print(arMaxP)
     if varMaxP == 'intercept':
-        print 'the intercept is not significant!'
+        print('the intercept is not significant!')
         break
     multi_analysis.remove(varMaxP)
     y = trainData['y']
@@ -432,7 +434,7 @@ auc = roc_auc_score(trainData['y'],trainData['prob'])  #AUC = 0.73
 
 
 #将模型保存
-saveModel =open(folderOfData+'LR_Model_Normal.pkl','w')
+saveModel =open(folderOfData+'LR_Model_Normal.pkl','wb')
 pickle.dump(LR,saveModel)
 saveModel.close()
 
@@ -452,7 +454,7 @@ X_train.shape, y_train.shape
 model_parameter = {}
 for C_penalty in np.arange(0.005, 0.2,0.005):
     for bad_weight in range(2, 101, 2):
-        print C_penalty, bad_weight
+        print(C_penalty, bad_weight)
         LR_model_2 = LogisticRegressionCV(Cs=[C_penalty], penalty='l1', solver='liblinear', class_weight={1:bad_weight, 0:1})
         LR_model_2_fit = LR_model_2.fit(X_train,y_train)
         y_pred = LR_model_2_fit.predict_proba(X_test)[:,1]
