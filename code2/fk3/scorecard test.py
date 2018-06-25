@@ -1,4 +1,16 @@
-
+import pandas as pd
+import pickle
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+import seaborn as sns
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from sklearn.linear_model import LogisticRegressionCV
+import statsmodels.api as sm
+from sklearn.ensemble import RandomForestClassifier
+from numpy import log
+import numpy as np
+from sklearn.metrics import roc_auc_score,roc_curve,auc
+from scorecard_functions_V3 import *
 
 def ModifyDf(x, new_value):
     if np.isnan(x):
@@ -10,10 +22,11 @@ def ModifyDf(x, new_value):
 '''
 将模型应用在测试数据集上
 '''
-
-testDataFile = open(folderOfData+'testData.pkl','r')
-testData = pickle.load((testDataFile))
+folderOfData = 'pickle文件'
+testDataFile = open(folderOfData+'testData.pkl','rb')
+testData = pickle.load( testDataFile , encoding = 'latin1')
 testDataFile.close()
+
 
 '''
 第一步：完成数据预处理
@@ -24,7 +37,7 @@ testDataFile.close()
 testData['int_rate_clean'] = testData['int_rate'].map(lambda x: float(x.replace('%',''))/100)
 
 # 将工作年限进行转化，否则影响排序
-testData['emp_length_clean'] = testData['emp_length'].map(CareerYear)
+testData['emp_length_clean'] = testData['emp_length'].astype(str).map(CareerYear)
 
 # 将desc的缺失作为一种状态，非缺失作为另一种状态
 testData['desc_clean'] = testData['desc'].map(DescExisting)
@@ -52,28 +65,29 @@ testData['earliest_cr_to_app'] = testData.apply(lambda x: MonthGap(x.earliest_cr
 '''
 第三步：分箱并代入WOE值
 '''
-modelFile =open(folderOfData+'LR_Model_Normal.pkl','r')
+modelFile =open(folderOfData+'LR_Model_Normal.pkl','rb')
 LR = pickle.load(modelFile)
 modelFile.close()
 
 #对变量的处理只需针对入模变量即可
 var_in_model = list(LR.pvalues.index)
+print('var_in_model---->',var_in_model)
 var_in_model.remove('intercept')
 
-file1 = open(folderOfData+'merge_bin_dict.pkl','r')
+file1 = open(folderOfData+'merge_bin_dict.pkl','rb')
 merge_bin_dict = pickle.load(file1)
 file1.close()
 
 
-file2 = open(folderOfData+'br_encoding_dict.pkl','r')
+file2 = open(folderOfData+'br_encoding_dict.pkl','rb')
 br_encoding_dict = pickle.load(file2)
 file2.close()
 
-file3 = open(folderOfData+'continous_merged_dict.pkl','r')
+file3 = open(folderOfData+'continous_merged_dict.pkl','rb')
 continous_merged_dict = pickle.load(file3)
 file3.close()
 
-file4 = open(folderOfData+'WOE_dict.pkl','r')
+file4 = open(folderOfData+'WOE_dict.pkl','rb')
 WOE_dict = pickle.load(file4)
 file4.close()
 
@@ -82,13 +96,13 @@ for var in var_in_model:
 
     # 有些取值个数少、但是需要合并的变量
     if var1 in merge_bin_dict.keys():
-        print "{} need to be regrouped".format(var1)
+        print("{} need to be regrouped".format(var1))
         testData[var1 + '_Bin'] = testData[var1].map(merge_bin_dict[var1])
 
     # 有些变量需要用bad rate进行编码
     if var1.find('_br_encoding')>-1:
         var2 =var1.replace('_br_encoding','')
-        print "{} need to be encoded by bad rate".format(var2)
+        print("{} need to be encoded by bad rate".format(var2))
         testData[var1] = testData[var2].map(br_encoding_dict[var2])
         #需要注意的是，有可能在测试样中某些值没有出现在训练样本中，从而无法得出对应的bad rate是多少。故可以用最坏（即最大）的bad rate进行编码
         max_br = max(testData[var1])
@@ -118,7 +132,8 @@ testData['prob'] = LR.predict(testData2)
 #计算KS和AUC
 auc = roc_auc_score(testData['y'],testData['prob'])
 ks = KS(testData, 'prob', 'y')
-
+print('ks-->',ks,'auc-->',auc)
+rocGraph(testData['y'],testData['prob'])
 
 basePoint = 250
 PDO = 200
@@ -131,6 +146,7 @@ plt.hist(testData['score'], 100)
 plt.xlabel('score')
 plt.ylabel('freq')
 plt.title('distribution')
+plt.show()
 
 
 

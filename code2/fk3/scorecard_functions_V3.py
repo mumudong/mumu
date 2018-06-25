@@ -1,5 +1,62 @@
 import numpy as np
 import pandas as pd
+import re
+import time
+import datetime
+from dateutil.relativedelta import relativedelta
+import matplotlib.pyplot as plt
+from sklearn.metrics import roc_auc_score,roc_curve,auc
+def CareerYear(x):
+    #对工作年限进行转换
+    if x.find('n/a') > -1 or x.find('nan') > -1:
+        return -1
+    elif x.find("10+")>-1:   #将"10＋years"转换成 11
+        return 11
+    elif x.find('< 1') > -1:  #将"< 1 year"转换成 0
+        return 0
+    else:
+        return int(re.sub("\D", "", x))   #其余数据，去掉"years"并转换成整数
+
+
+def DescExisting(x):
+    #将desc变量转换成有记录和无记录两种
+    if type(x).__name__ == 'float':
+        return 'no desc'
+    else:
+        return 'desc'
+
+
+def ConvertDateStr(x):
+    mth_dict = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10,
+                'Nov': 11, 'Dec': 12}
+    if str(x) == 'nan':
+        return datetime.datetime.fromtimestamp(time.mktime(time.strptime('9900-1','%Y-%m')))
+        #time.mktime 不能读取1970年之前的日期
+    else:
+        yr = int(x[4:6])
+        if yr <=17:
+            yr = 2000+yr
+        else:
+            yr = 1900 + yr
+        mth = mth_dict[x[:3]]
+        return datetime.datetime(yr,mth,1)
+
+
+def MonthGap(earlyDate, lateDate):
+    if lateDate > earlyDate:
+        gap = relativedelta(lateDate,earlyDate)
+        yr = gap.years
+        mth = gap.months
+        return yr*12+mth
+    else:
+        return 0
+
+
+def MakeupMissing(x):
+    if np.isnan(x):
+        return -1
+    else:
+        return x
 
 def SplitData(df, col, numOfSplit, special_attribute=[]):
     '''
@@ -22,44 +79,45 @@ def SplitData(df, col, numOfSplit, special_attribute=[]):
 
 
 
-# def Chi2(df, total_col, bad_col, overallRate):
-#     '''
-#     :param df: 包含全部样本总计与坏样本总计的数据框
-#     :param total_col: 全部样本的个数
-#     :param bad_col: 坏样本的个数
-#     :param overallRate: 全体样本的坏样本占比
-#     :return: 卡方值
-#     '''
-#     df2 = df.copy()
-#     # 期望坏样本个数＝全部样本个数*平均坏样本占比
-#     df2['expected'] = df[total_col].apply(lambda x: x*overallRate)
-#     combined = zip(df2['expected'], df2[bad_col])
-#     chi = [(i[0]-i[1])**2/i[0] for i in combined]
-#     chi2 = sum(chi)
-#     return chi2
-
-
-def Chi2(df, total_col, bad_col):
+def Chi2(df, total_col, bad_col, overallRate):
     '''
     :param df: 包含全部样本总计与坏样本总计的数据框
     :param total_col: 全部样本的个数
     :param bad_col: 坏样本的个数
+    :param overallRate: 全体样本的坏样本占比
     :return: 卡方值
     '''
     df2 = df.copy()
-    # 求出df中，总体的坏样本率和好样本率
-    badRate = sum(df2[bad_col])*1.0/sum(df2[total_col])
-    df2['good'] = df2.apply(lambda x: x[total_col] - x[bad_col], axis = 1)
-    goodRate = sum(df2['good']) * 1.0 / sum(df2[total_col])
-    # 期望坏（好）样本个数＝全部样本个数*平均坏（好）样本占比
-    df2['badExpected'] = df[total_col].apply(lambda x: x*badRate)
-    df2['goodExpected'] = df[total_col].apply(lambda x: x * goodRate)
-    badCombined = zip(df2['badExpected'], df2[bad_col])
-    goodCombined = zip(df2['goodExpected'], df2['good'])
-    badChi = [(i[0]-i[1])**2/i[0] for i in badCombined]
-    goodChi = [(i[0] - i[1]) ** 2 / i[0] for i in goodCombined]
-    chi2 = sum(badChi) + sum(goodChi)
+    # 期望坏样本个数＝全部样本个数*平均坏样本占比
+    df2['expected'] = df[total_col].apply(lambda x: x*overallRate)
+    combined = zip(df2['expected'], df2[bad_col])
+    chi = [(i[0]-i[1])**2/i[0] for i in combined]
+    chi2 = sum(chi)
     return chi2
+
+
+# def Chi2(df, total_col, bad_col):
+#     '''
+#     :param df: 包含全部样本总计与坏样本总计的数据框
+#     :param total_col: 全部样本的个数
+#     :param bad_col: 坏样本的个数
+#     :return: 卡方值
+#     '''
+#     df2 = df.copy()
+#     # 求出df中，总体的坏样本率和好样本率
+#     badRate = sum(df2[bad_col])*1.0/sum(df2[total_col])
+#     print('badRate-->',badRate)
+#     df2['good'] = df2.apply(lambda x: x[total_col] - x[bad_col], axis = 1)
+#     goodRate = sum(df2['good']) * 1.0 / sum(df2[total_col])
+#     # 期望坏（好）样本个数＝全部样本个数*平均坏（好）样本占比
+#     df2['badExpected'] = df[total_col].apply(lambda x: x*badRate)
+#     df2['goodExpected'] = df[total_col].apply(lambda x: x * goodRate)
+#     badCombined = zip(df2['badExpected'], df2[bad_col])
+#     goodCombined = zip(df2['goodExpected'], df2['good'])
+#     badChi = [(i[0]-i[1])**2/i[0] for i in badCombined]
+#     goodChi = [(i[0] - i[1]) ** 2 / i[0] for i in goodCombined]
+#     chi2 = sum(badChi) + sum(goodChi)
+#     return chi2
 
 
 # Chi2 的另外一种计算方法
@@ -151,8 +209,8 @@ def ChiMerge(df, col, target, max_interval=5,special_attribute=[],minBinPcnt=0):
             for k in range(len(groupIntervals)-1):
                 temp_group = groupIntervals[k] + groupIntervals[k+1]
                 df2b = regroup.loc[regroup['temp'].isin(temp_group)]
-                #chisq = Chi2(df2b, 'total', 'bad', overallRate)
-                chisq = Chi2(df2b, 'total', 'bad')
+                chisq = Chi2(df2b, 'total', 'bad', overallRate)
+                # chisq = Chi2(df2b, 'total', 'bad')
                 chisqList.append(chisq)
             best_comnbined = chisqList.index(min(chisqList))
             groupIntervals[best_comnbined] = groupIntervals[best_comnbined] + groupIntervals[best_comnbined+1]
@@ -183,14 +241,14 @@ def ChiMerge(df, col, target, max_interval=5,special_attribute=[],minBinPcnt=0):
                 prevIndex = list(regroup.temp_Bin)[currentIndex - 1]
                 df3 = df2.loc[df2['temp_Bin'].isin([prevIndex, bin])]
                 (binBadRate, df2b) = BinBadRate(df3, 'temp_Bin', target)
-                #chisq1 = Chi2(df2b, 'total', 'bad', overallRate)
-                chisq1 = Chi2(df2b, 'total', 'bad')
+                chisq1 = Chi2(df2b, 'total', 'bad', overallRate)
+                # chisq1 = Chi2(df2b, 'total', 'bad')
                 # 和后一箱进行合并，并且计算卡方值
                 laterIndex = list(regroup.temp_Bin)[currentIndex + 1]
                 df3b = df2.loc[df2['temp_Bin'].isin([laterIndex, bin])]
                 (binBadRate, df2b) = BinBadRate(df3b, 'temp_Bin', target)
-                #chisq2 = Chi2(df2b, 'total', 'bad', overallRate)
-                chisq2 = Chi2(df2b, 'total', 'bad')
+                chisq2 = Chi2(df2b, 'total', 'bad', overallRate)
+                # chisq2 = Chi2(df2b, 'total', 'bad')
                 if chisq1 < chisq2:
                     cutOffPoints.remove(cutOffPoints[currentIndex - 1])
                 else:
@@ -224,14 +282,14 @@ def ChiMerge(df, col, target, max_interval=5,special_attribute=[],minBinPcnt=0):
                     prevIndex = list(valueCounts.index)[currentIndex - 1]
                     df3 = df2.loc[df2['temp_Bin'].isin([prevIndex, indexForMinPcnt])]
                     (binBadRate, df2b) = BinBadRate(df3, 'temp_Bin', target)
-                    #chisq1 = Chi2(df2b, 'total', 'bad', overallRate)
-                    chisq1 = Chi2(df2b, 'total', 'bad')
+                    chisq1 = Chi2(df2b, 'total', 'bad', overallRate)
+                    # chisq1 = Chi2(df2b, 'total', 'bad')
                     # 和后一箱进行合并，并且计算卡方值
                     laterIndex = list(valueCounts.index)[currentIndex + 1]
                     df3b = df2.loc[df2['temp_Bin'].isin([laterIndex, indexForMinPcnt])]
                     (binBadRate, df2b) = BinBadRate(df3b, 'temp_Bin', target)
-                    #chisq2 = Chi2(df2b, 'total', 'bad', overallRate)
-                    chisq2 = Chi2(df2b, 'total', 'bad')
+                    chisq2 = Chi2(df2b, 'total', 'bad', overallRate)
+                    # chisq2 = Chi2(df2b, 'total', 'bad')
                     if chisq1 < chisq2:
                         cutOffPoints.remove(cutOffPoints[currentIndex - 1])
                     else:
@@ -430,4 +488,17 @@ def KS(df, score, target):
     all['badCumRate'] = all['bad'].cumsum() / all['bad'].sum()
     all['goodCumRate'] = all['good'].cumsum() / all['good'].sum()
     KS = all.apply(lambda x: x.badCumRate - x.goodCumRate, axis=1)
+    plt.plot(all['badCumRate'],label='bad')
+    plt.plot(all['goodCumRate'],label='good')
+    plt.legend()
+    plt.title('KS bight')
+    plt.show()
+
     return max(KS)
+def rocGraph(dataT,dataP):
+    fpr,tpr,thresholds = roc_curve(dataT,dataP)
+    roc_auc = auc(fpr,tpr)
+    plt.plot(fpr, tpr, lw=1, label='ROC(area = %0.2f)' % ( roc_auc ))
+    plt.legend()
+    plt.title('roc bight')
+    plt.show()

@@ -1,9 +1,5 @@
 import pandas as pd
-import re
-import time
-import datetime
 import pickle
-from dateutil.relativedelta import relativedelta
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -16,57 +12,7 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 from scorecard_functions_V3 import *
 
-def CareerYear(x):
-    #对工作年限进行转换
-    if x.find('n/a') > -1 or x.find('nan') > -1:
-        return -1
-    elif x.find("10+")>-1:   #将"10＋years"转换成 11
-        return 11
-    elif x.find('< 1') > -1:  #将"< 1 year"转换成 0
-        return 0
-    else:
-        return int(re.sub("\D", "", x))   #其余数据，去掉"years"并转换成整数
 
-
-def DescExisting(x):
-    #将desc变量转换成有记录和无记录两种
-    if type(x).__name__ == 'float':
-        return 'no desc'
-    else:
-        return 'desc'
-
-
-def ConvertDateStr(x):
-    mth_dict = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10,
-                'Nov': 11, 'Dec': 12}
-    if str(x) == 'nan':
-        return datetime.datetime.fromtimestamp(time.mktime(time.strptime('9900-1','%Y-%m')))
-        #time.mktime 不能读取1970年之前的日期
-    else:
-        yr = int(x[4:6])
-        if yr <=17:
-            yr = 2000+yr
-        else:
-            yr = 1900 + yr
-        mth = mth_dict[x[:3]]
-        return datetime.datetime(yr,mth,1)
-
-
-def MonthGap(earlyDate, lateDate):
-    if lateDate > earlyDate:
-        gap = relativedelta(lateDate,earlyDate)
-        yr = gap.years
-        mth = gap.months
-        return yr*12+mth
-    else:
-        return 0
-
-
-def MakeupMissing(x):
-    if np.isnan(x):
-        return -1
-    else:
-        return x
 
 
 
@@ -158,9 +104,10 @@ trainData['earliest_cr_to_app'] = trainData.apply(lambda x: MonthGap(x.earliest_
     （b1）如果每种类别同时包含好坏样本，无需分箱
     （b2）如果有类别只包含好坏样本的一种，需要合并
 '''
+#数值型变量
 num_features = ['int_rate_clean','emp_length_clean','annual_inc', 'dti', 'delinq_2yrs', 'earliest_cr_to_app','inq_last_6mths', \
                 'mths_since_last_record_clean', 'mths_since_last_delinq_clean','open_acc','pub_rec','total_acc','limit_income','earliest_cr_to_app']
-
+#类型型变量
 cat_features = ['home_ownership', 'verification_status','desc_clean', 'purpose', 'zip_code','addr_state','pub_rec_bankruptcies_clean']
 
 
@@ -321,7 +268,7 @@ trainDataWOE = trainData[short_list_2]
 f, ax = plt.subplots(figsize=(10, 8))
 corr = trainDataWOE.corr()
 sns.heatmap(corr, mask=np.zeros_like(corr, dtype=np.bool), cmap=sns.diverging_palette(220, 10, as_cmap=True),square=True, ax=ax)
-
+plt.show()
 
 #两两间的线性相关性检验
 #1，将候选变量按照IV进行降序排列
@@ -380,13 +327,13 @@ pvals = pvals.to_dict()
 
 # ### 有些变量不显著，需要逐步剔除
 varLargeP = {k: v for k,v in pvals.items() if v >= 0.1}
-varLargeP = sorted(varLargeP.iteritems(), key=lambda d:d[1], reverse = True)
+varLargeP = sorted(varLargeP.items(), key=lambda d:d[1], reverse = True)
 while(len(varLargeP) > 0 and len(multi_analysis) > 0):
     # 每次迭代中，剔除最不显著的变量，直到
     # (1) 剩余所有变量均显著
     # (2) 没有特征可选
     varMaxP = varLargeP[0][0]
-    print(arMaxP)
+    print(varMaxP)
     if varMaxP == 'intercept':
         print('the intercept is not significant!')
         break
@@ -399,7 +346,7 @@ while(len(varLargeP) > 0 and len(multi_analysis) > 0):
     pvals = LR.pvalues
     pvals = pvals.to_dict()
     varLargeP = {k: v for k, v in pvals.items() if v >= 0.1}
-    varLargeP = sorted(varLargeP.iteritems(), key=lambda d: d[1], reverse=True)
+    varLargeP = sorted(varLargeP.items(), key=lambda d: d[1], reverse=True)
 
 summary = LR.summary()
 """
@@ -459,10 +406,13 @@ for C_penalty in np.arange(0.005, 0.2,0.005):
         LR_model_2_fit = LR_model_2.fit(X_train,y_train)
         y_pred = LR_model_2_fit.predict_proba(X_test)[:,1]
         scorecard_result = pd.DataFrame({'prob':y_pred, 'target':y_test})
-        #performance = KS_AR(scorecard_result,'prob','target')
-        KS = performance['KS']
-        model_parameter[(C_penalty, bad_weight)] = KS
+        performance = KS(scorecard_result,'prob','target')
+        # KS = performance['KS']
+        # KS = performance
+        model_parameter[(C_penalty, bad_weight)] = performance #KS
 
+# auc = roc_auc_score(testData['y'],testData['prob'])
+# ks = KS(testData, 'prob', 'y')
 # endtime = datetime.datetime.now()
 # print (endtime - starttime).seconds
 
@@ -480,7 +430,7 @@ RFC = RandomForestClassifier()
 RFC_Model = RFC.fit(X,y)
 features_rfc = trainData[var_WOE_list].columns
 featureImportance = {features_rfc[i]:RFC_Model.feature_importances_[i] for i in range(len(features_rfc))}
-featureImportanceSorted = sorted(featureImportance.iteritems(),key=lambda x: x[1], reverse=True)
+featureImportanceSorted = sorted(featureImportance.items(),key=lambda x: x[1], reverse=True)
 # we selecte the top 10 features
 features_selection = [k[0] for k in featureImportanceSorted[:8]]
 
