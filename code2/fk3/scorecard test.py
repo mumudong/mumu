@@ -26,7 +26,7 @@ folderOfData = 'pickle文件'
 testDataFile = open(folderOfData+'testData.pkl','rb')
 testData = pickle.load( testDataFile , encoding = 'latin1')
 testDataFile.close()
-
+print(testData.head())
 
 '''
 第一步：完成数据预处理

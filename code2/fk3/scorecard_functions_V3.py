@@ -146,10 +146,10 @@ def BinBadRate(df, col, target, grantRateIndicator=0):
     total = pd.DataFrame({'total': total})
     bad = df.groupby([col])[target].sum()
     bad = pd.DataFrame({'bad': bad})
-    regroup = total.merge(bad, left_index=True, right_index=True, how='left')
-    regroup.reset_index(level=0, inplace=True)
+    regroup = total.merge(bad, left_index=True, right_index=True, how='left') # 合并之后col列成索引
+    regroup.reset_index(level=0, inplace=True) # 将col索引转为col列，并添加索引
     regroup['bad_rate'] = regroup.apply(lambda x: x.bad * 1.0 / x.total, axis=1)
-    dicts = dict(zip(regroup[col],regroup['bad_rate']))
+    dicts = dict(zip(regroup[col],regroup['bad_rate'])) # 得到 分区<- bad_rate分值
     if grantRateIndicator==0:
         return (dicts, regroup)
     N = sum(regroup['total'])
@@ -350,7 +350,7 @@ def BadRateEncoding(df, col, target):
     regroup = BinBadRate(df, col, target, grantRateIndicator=0)[1]
     br_dict = regroup[[col,'bad_rate']].set_index([col]).to_dict(orient='index')
     for k, v in br_dict.items():
-        br_dict[k] = v['bad_rate']
+        br_dict[k] = v['bad_rate']  # {类别：bad_rate}
     badRateEnconding = df[col].map(lambda x: br_dict[x])
     return {'encoding':badRateEnconding, 'bad_rate':br_dict}
 
@@ -441,12 +441,12 @@ def MergeBad0(df,col,target, direction='bad'):
     regroup = BinBadRate(df, col, target)[1]
     if direction == 'bad':
         # 如果是合并0坏样本率的组，则跟最小的非0坏样本率的组进行合并
-        regroup = regroup.sort_values(by  = 'bad_rate')
+        regroup = regroup.sort_values(by='bad_rate')
     else:
         # 如果是合并0好样本样本率的组，则跟最小的非0好样本率的组进行合并
         regroup = regroup.sort_values(by='bad_rate',ascending=False)
     regroup.index = range(regroup.shape[0])
-    col_regroup = [[i] for i in regroup[col]]
+    col_regroup = [[i] for i in regroup[col]] # 类别
     del_index = []
     for i in range(regroup.shape[0]-1):
         col_regroup[i+1] = col_regroup[i] + col_regroup[i+1]

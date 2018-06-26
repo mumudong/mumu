@@ -12,18 +12,12 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 from scorecard_functions_V3 import *
 
-
-
-
-
 # 数据预处理
 # 1，读入数据
 # 2，选择合适的建模样本
 # 3，数据集划分成训练集和测试集
 
-
 folderOfData = 'pickle文件'
-
 
 allData = pd.read_csv('application.csv',header = 0, encoding = 'latin1')
 allData['term'] = allData['term'].apply(lambda x: int(x.replace(' months','')))
@@ -31,15 +25,13 @@ allData['term'] = allData['term'].apply(lambda x: int(x.replace(' months','')))
 # 处理标签：Fully Paid是正常用户；Charged Off是违约用户
 allData['y'] = allData['loan_status'].map(lambda x: int(x == 'Charged Off'))
 
-
-
 '''
 由于存在不同的贷款期限（term），申请评分卡模型评估的违约概率必须要在统一的期限中，且不宜太长，所以选取term＝36months的行本
 '''
 
 allData1 = allData.loc[allData.term == 36]
 
-trainData, testData = train_test_split(allData1,test_size=0.4)
+trainData, testData = train_test_split(allData1,test_size=0.3)
 
 #固化变量
 trainDataFile = open(folderOfData+'trainData.pkl','wb')
@@ -54,11 +46,8 @@ testDataFile.close()
 第一步：数据预处理，包括
 （1）数据清洗
 （2）格式转换
-（3）确实值填补
+（3）缺失值填补
 '''
-
-
-
 
 # 将带％的百分比变为浮点数
 trainData['int_rate_clean'] = trainData['int_rate'].map(lambda x: float(x.replace('%',''))/100)
@@ -89,7 +78,6 @@ trainData['limit_income'] = trainData.apply(lambda x: x.loan_amnt / x.annual_inc
 # 考虑earliest_cr_line到申请日期的跨度，以月份记
 trainData['earliest_cr_to_app'] = trainData.apply(lambda x: MonthGap(x.earliest_cr_line_clean,x.app_date_clean), axis = 1)
 
-
 '''
 第三步：分箱，采用ChiMerge,要求分箱完之后：
 （1）不超过5箱
@@ -110,9 +98,8 @@ num_features = ['int_rate_clean','emp_length_clean','annual_inc', 'dti', 'delinq
 #类型型变量
 cat_features = ['home_ownership', 'verification_status','desc_clean', 'purpose', 'zip_code','addr_state','pub_rec_bankruptcies_clean']
 
-
-more_value_features = []
-less_value_features = []
+more_value_features = [] # 类别变量，取值超过5
+less_value_features = [] # 取值小于5
 # 第一步，检查类别型变量中，哪些变量取值超过5
 for var in cat_features:
     valueCounts = len(set(trainData[var]))
@@ -123,13 +110,13 @@ for var in cat_features:
         less_value_features.append(var)
 
 # （i）当取值<5时：如果每种类别同时包含好坏样本，无需分箱；如果有类别只包含好坏样本的一种，需要合并
-merge_bin_dict = {}  #存放需要合并的变量，以及合并方法
-var_bin_list = []   #由于某个取值没有好或者坏样本而需要合并的变量
+merge_bin_dict = {}  # 存放需要合并的变量，以及合并方法
+var_bin_list = []   # 由于某个取值没有好或者坏样本而需要合并的变量
 for col in less_value_features:
     binBadRate = BinBadRate(trainData, col, 'y')[0]
-    if min(binBadRate.values()) == 0 :  #由于某个取值没有坏样本而进行合并
+    if min(binBadRate.values()) == 0 :  # 由于某个取值没有坏样本而进行合并
         print('{} need to be combined due to 0 bad rate'.format(col))
-        combine_bin = MergeBad0(trainData, col, 'y')
+        combine_bin = MergeBad0(trainData, col, 'y') # 获取新的类别分箱
         merge_bin_dict[col] = combine_bin
         newVar = col + '_Bin'
         trainData[newVar] = trainData[col].map(combine_bin)
@@ -219,9 +206,9 @@ file3.close()
 WOE_dict = {}
 IV_dict = {}
 # 分箱后的变量进行编码，包括：
-# 1，初始取值个数小于5，且不需要合并的类别型变量。存放在less_value_features中
-# 2，初始取值个数小于5，需要合并的类别型变量。合并后新的变量存放在var_bin_list中
-# 3，初始取值个数超过5，需要合并的类别型变量。合并后新的变量存放在var_bin_list中
+# 1，初始取值个数小于5，且不需要合并的类别型变量。存放在less_value_features中,原始列名
+# 2，初始取值个数小于5，需要合并的类别型变量。合并后新的变量存放在var_bin_list中，后缀 _Bin
+# 3，初始取值个数超过5，需要合并的类别型变量。合并后新的变量列名_br_encoding，先存放连续变量中，卡方分箱后加_Bin存放在var_bin_list中
 # 4，连续变量。分箱后新的变量存放在var_bin_list中
 all_var = var_bin_list  + less_value_features
 for var in all_var:
@@ -242,7 +229,7 @@ IV_values = [i[1] for i in IV_dict_sorted]
 IV_name = [i[0] for i in IV_dict_sorted]
 plt.title('feature IV')
 plt.bar(range(len(IV_values)),IV_values)
-
+plt.show()
 
 
 
@@ -303,7 +290,7 @@ X = np.matrix(trainData[multi_analysis_vars_1])
 VIF_list = [variance_inflation_factor(X, i) for i in range(X.shape[1])]
 max_VIF = max(VIF_list)
 print(max_VIF)
-# 最大的VIF是1.32267733123，因此这一步认为没有多重共线性
+# 最大的VIF是1.32267733123，一般小于9认为无关，因此这一步认为没有多重共线性
 multi_analysis = multi_analysis_vars_1
 
 
