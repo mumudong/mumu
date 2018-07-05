@@ -65,12 +65,16 @@ testData['earliest_cr_to_app'] = testData.apply(lambda x: MonthGap(x.earliest_cr
 '''
 第三步：分箱并代入WOE值
 '''
-modelFile =open(folderOfData+'LR_Model_Normal.pkl','rb')
-LR = pickle.load(modelFile)
+file1 = open(folderOfData+'LR_Model_Normal.pkl','rb')
+LR = pickle.load(file1)
+file1.close()
+
+modelFile =open(folderOfData+'var_in_model.pkl','rb')
+var_in_model = pickle.load(modelFile)
 modelFile.close()
 
 #对变量的处理只需针对入模变量即可
-var_in_model = list(LR.pvalues.index)
+var_in_model = list(var_in_model)
 print('var_in_model---->',var_in_model)
 var_in_model.remove('intercept')
 
@@ -85,12 +89,13 @@ file2.close()
 
 file3 = open(folderOfData+'continous_merged_dict.pkl','rb')
 continous_merged_dict = pickle.load(file3)
+print(continous_merged_dict.items())
 file3.close()
 
 file4 = open(folderOfData+'WOE_dict.pkl','rb')
 WOE_dict = pickle.load(file4)
 file4.close()
-
+print('columns ==> ',testData.columns)
 for var in var_in_model:
     var1 = var.replace('_Bin_WOE','')
 
@@ -110,10 +115,11 @@ for var in var_in_model:
 
 
     #上述处理后，需要加上连续型变量一起进行分箱
-    if -1 not in set(testData[var1]):
-        testData[var1+'_Bin'] = testData[var1].map(lambda x: AssignBin(x, continous_merged_dict[var1]))
-    else:
-        testData[var1 + '_Bin'] = testData[var1].map(lambda x: AssignBin(x, continous_merged_dict[var1],[-1]))
+    if var1 in set(continous_merged_dict.keys()):
+        if -1 not in set(testData[var1]):
+            testData[var1+'_Bin'] = testData[var1].map(lambda x: AssignBin(x, continous_merged_dict[var1]))
+        else:
+            testData[var1 + '_Bin'] = testData[var1].map(lambda x: AssignBin(x, continous_merged_dict[var1],[-1]))
 
     #WOE编码
     var3 = var.replace('_WOE','')
@@ -126,8 +132,8 @@ for var in var_in_model:
 testData['intercept'] = [1]*testData.shape[0]
 #预测数据集中，变量顺序需要和LR模型的变量顺序一致
 #例如在训练集里，变量在数据中的顺序是“负债比”在“借款目的”之前，对应地，在测试集里，“负债比”也要在“借款目的”之前
-testData2 = testData[list(LR.params.index)]
-testData['prob'] = LR.predict(testData2)
+testData2 = testData[var_in_model]
+testData['prob'] = LR.predict_proba(testData2)[:,1]
 
 #计算KS和AUC
 auc = roc_auc_score(testData['y'],testData['prob'])

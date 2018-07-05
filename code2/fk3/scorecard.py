@@ -4,12 +4,12 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import LogisticRegressionCV,LogisticRegression
 import statsmodels.api as sm
 from sklearn.ensemble import RandomForestClassifier
 from numpy import log
 import numpy as np
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score,f1_score,recall_score
 from scorecard_functions_V3 import *
 
 # 数据预处理
@@ -311,16 +311,17 @@ LR = sm.Logit(y, X).fit()
 summary = LR.summary()
 pvals = LR.pvalues
 pvals = pvals.to_dict()
-
+print('pvals --> ',{k: v for k,v in pvals.items()})
 # ### 有些变量不显著，需要逐步剔除
 varLargeP = {k: v for k,v in pvals.items() if v >= 0.1}
 varLargeP = sorted(varLargeP.items(), key=lambda d:d[1], reverse = True)
+print('varLarge === ',varLargeP)
 while(len(varLargeP) > 0 and len(multi_analysis) > 0):
     # 每次迭代中，剔除最不显著的变量，直到
     # (1) 剩余所有变量均显著
     # (2) 没有特征可选
     varMaxP = varLargeP[0][0]
-    print(varMaxP)
+    print('varMaxP --> ',varMaxP)
     if varMaxP == 'intercept':
         print('the intercept is not significant!')
         break
@@ -334,8 +335,14 @@ while(len(varLargeP) > 0 and len(multi_analysis) > 0):
     pvals = pvals.to_dict()
     varLargeP = {k: v for k, v in pvals.items() if v >= 0.1}
     varLargeP = sorted(varLargeP.items(), key=lambda d: d[1], reverse=True)
-
+    print('varLargeP --> ',varLargeP)
 summary = LR.summary()
+print('summary:\n',summary)
+# 保存变量
+saveModel =open(folderOfData+'var_in_model.pkl','wb')
+pickle.dump(LR.pvalues.index,saveModel)
+saveModel.close()
+
 """
                            Logit Regression Results                           
 ==============================================================================
@@ -362,20 +369,28 @@ intercept                               -2.0969      0.027    -78.744      0.000
 """
 
 
-trainData['prob'] = LR.predict(X)
-auc = roc_auc_score(trainData['y'],trainData['prob'])  #AUC = 0.73
-
+# trainData['prob'] = LR.predict(X)
+# regressionModel = LogisticRegression().fit(X,y)
+# trainData['probility'] = regressionModel.predict(X)
+# print(trainData[['score']].head())
+# auc = roc_auc_score(trainData['y'],trainData['prob'])  #AUC = 0.73
+# f1score = f1_score(trainData['y'],trainData['score'])
+# recall = recall_score(trainData['y'],trainData['score'])
+# print(' auc----> ',auc)
+# print(' f1score --> ',f1score)
+# print(' recall --> ',recall)
 
 
 #将模型保存
-saveModel =open(folderOfData+'LR_Model_Normal.pkl','wb')
-pickle.dump(LR,saveModel)
-saveModel.close()
+# saveModel =open(folderOfData+'LR_Model_Normal.pkl','wb')
+# pickle.dump(LR,saveModel)
+# saveModel.close()
 
 
 #############################################################################################################
 #尝试用L1约束#
 ## use cross validation to select the best regularization parameter
+
 multi_analysis = multi_analysis_vars_1
 X = trainData[multi_analysis]   #by default  LogisticRegressionCV() fill fit the intercept
 X = np.matrix(X)
@@ -383,13 +398,15 @@ y = trainData['y']
 y = np.array(y)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=0)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=0)
 X_train.shape, y_train.shape
 #
 model_parameter = {}
 for C_penalty in np.arange(0.005, 0.2,0.005):
     for bad_weight in range(2, 101, 2):
         print(C_penalty, bad_weight)
-        LR_model_2 = LogisticRegressionCV(Cs=[C_penalty], penalty='l1', solver='liblinear', class_weight={1:bad_weight, 0:1})
+        #使用交叉验证来选择正则化系数C
+        LR_model_2 = LogisticRegressionCV(Cs=[C_penalty], penalty='l2', solver='lbfgs', class_weight={1:bad_weight, 0:1})
         LR_model_2_fit = LR_model_2.fit(X_train,y_train)
         y_pred = LR_model_2_fit.predict_proba(X_test)[:,1]
         scorecard_result = pd.DataFrame({'prob':y_pred, 'target':y_test})
@@ -397,14 +414,31 @@ for C_penalty in np.arange(0.005, 0.2,0.005):
         # KS = performance['KS']
         # KS = performance
         model_parameter[(C_penalty, bad_weight)] = performance #KS
-
+sortparam = sorted(model_parameter,key=lambda x:x[1],reverse=True)
+penalty,badWeight = sortparam[0]
+LR_model_2 = LogisticRegressionCV(Cs=[penalty], penalty='l1', solver='liblinear', class_weight={1:badWeight, 0:1})
+LR_model_2_fit = LR_model_2.fit(X_train,y_train)
+y_prob = LR_model_2_fit.predict_proba(X_test)[:,1]
+print('y_prob --> ',y_prob.shape)
+y_pred = LR_model_2_fit.predict(X_test)
+print('y_pred --> ',y_pred.shape)
+scorecard_result = pd.DataFrame({'prob':y_prob, 'target':y_test,'pred':y_pred})
+performance = KS(scorecard_result,'prob','target')
+print('ks --> ',performance)
+print('auc --> ',roc_auc_score(scorecard_result['target'],scorecard_result['prob']))
+print(' f1score --> ',f1_score(scorecard_result['target'],scorecard_result['pred']))
+print(' recall --> ',recall_score(scorecard_result['target'],scorecard_result['pred']))
 # auc = roc_auc_score(testData['y'],testData['prob'])
 # ks = KS(testData, 'prob', 'y')
 # endtime = datetime.datetime.now()
 # print (endtime - starttime).seconds
-
-
-
+#将模型保存
+saveModel =open(folderOfData+'LR_Model_Normal.pkl','wb')
+pickle.dump(LR_model_2_fit,saveModel)
+saveModel.close()
+print('模型变量:',list(LR.pvalues.index))
+print('模型变量:',multi_analysis)
+'''
 # 用随机森林法估计变量重要性#
 #
 var_WOE_list = multi_analysis_vars_1
@@ -428,7 +462,7 @@ X['intercept'] = [1]*X.shape[0]
 
 LR = sm.Logit(y, X).fit()
 summary = LR.summary()
-
+'''
 
 
 
