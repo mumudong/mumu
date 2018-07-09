@@ -20,7 +20,9 @@ class ScoreModel:
         self.LR = pickle.load(modelFile)
         modelFile.close()
         #对变量的处理只需针对入模变量即可
-        self.var_in_model = list(self.LR.pvalues.index)
+        modelFile =open(folderOfData+'var_in_model.pkl','rb')
+        self.var_in_model = pickle.load(modelFile)
+        modelFile.close()
         print('var_in_model---->',self.var_in_model)
         self.var_in_model.remove('intercept')
         # 获取分箱字典
@@ -121,10 +123,11 @@ class ScoreModel:
                 max_br = max(testData[var1])
                 testData[var1] = testData[var1].map(lambda x: self.ModifyDf(x, max_br))
             #上述处理后，需要加上连续型变量一起进行分箱
-            if -1 not in set(testData[var1]):
-                testData[var1+'_Bin'] = testData[var1].map(lambda x: AssignBin(x, self.continous_merged_dict[var1]))
-            else:
-                testData[var1 + '_Bin'] = testData[var1].map(lambda x: AssignBin(x, self.continous_merged_dict[var1],[-1]))
+            if var1 in set(self.continous_merged_dict.keys()):
+                if -1 not in set(testData[var1]):
+                    testData[var1+'_Bin'] = testData[var1].map(lambda x: AssignBin(x, self.continous_merged_dict[var1]))
+                else:
+                    testData[var1 + '_Bin'] = testData[var1].map(lambda x: AssignBin(x, self.continous_merged_dict[var1],[-1]))
             #WOE编码
             var3 = var.replace('_WOE','')
             testData[var] = testData[var3].map(self.WOE_dict[var3])
@@ -134,8 +137,8 @@ class ScoreModel:
         testData['intercept'] = [1]*testData.shape[0]
         #预测数据集中，变量顺序需要和LR模型的变量顺序一致
         #例如在训练集里，变量在数据中的顺序是“负债比”在“借款目的”之前，对应地，在测试集里，“负债比”也要在“借款目的”之前
-        testData2 = testData[list(self.LR.params.index)]
-        prop = self.LR.predict(testData2)
+        testData2 = testData[self.var_in_model]
+        prop = self.LR.predict_proba(testData2)[:,1]
         score = self.Prob2Score(prop)
         id = int(record.split(",")[0])
         return id,score

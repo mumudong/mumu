@@ -488,11 +488,11 @@ def KS(df, score, target):
     all['badCumRate'] = all['bad'].cumsum() / all['bad'].sum()
     all['goodCumRate'] = all['good'].cumsum() / all['good'].sum()
     KS = all.apply(lambda x: x.badCumRate - x.goodCumRate, axis=1)
-    plt.plot(all['badCumRate'],label='bad')
-    plt.plot(all['goodCumRate'],label='good')
-    plt.legend()
-    plt.title('KS bight')
-    plt.show()
+    # plt.plot(all['badCumRate'],label='bad')
+    # plt.plot(all['goodCumRate'],label='good')
+    # plt.legend()
+    # plt.title('KS bight')
+    # plt.show()
 
     return max(KS)
 def rocGraph(dataT,dataP):

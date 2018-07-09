@@ -422,7 +422,7 @@ X_train.shape, y_train.shape
 # sortparam = sorted(model_parameter,key=lambda x:x[1],reverse=True)
 # print('sortedparam --> ',sortparam[0],model_parameter[sortparam[0]],sortparam[1],model_parameter[sortparam[0]])
 # penalty,badWeight = sortparam[0]
-LR_model_2 = LogisticRegressionCV(penalty='l2', solver='lbfgs')
+LR_model_2 = LogisticRegressionCV(penalty='l2', solver='lbfgs',scoring='roc_auc',cv=3,class_weight={1:10,0:1})
 LR_model_2_fit = LR_model_2.fit(X_train,y_train)
 y_prob = LR_model_2_fit.predict_proba(X_test)[:,1]
 print('y_prob --> ',y_prob.shape)

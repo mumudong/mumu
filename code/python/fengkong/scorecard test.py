@@ -65,13 +65,15 @@ testData['earliest_cr_to_app'] = testData.apply(lambda x: MonthGap(x.earliest_cr
 '''
 第三步：分箱并代入WOE值
 '''
-modelFile =open(folderOfData+'LR_Model_Normal.pkl','rb')
-LR = pickle.load(modelFile)
-modelFile.close()
+file1 = open(folderOfData+'LR_Model_Normal.pkl','rb')
+LR = pickle.load(file1)
+file1.close()
 
 #对变量的处理只需针对入模变量即可
-var_in_model = list(LR.pvalues.index)
-print('var_in_model---->',var_in_model)
+modelFile =open(folderOfData+'var_in_model.pkl','rb')
+var_in_model = pickle.load(modelFile)
+modelFile.close()
+var_in_model = list(var_in_model)
 var_in_model.remove('intercept')
 
 file1 = open(folderOfData+'merge_bin_dict.pkl','rb')
@@ -108,12 +110,12 @@ for var in var_in_model:
         max_br = max(testData[var1])
         testData[var1] = testData[var1].map(lambda x: ModifyDf(x, max_br))
 
-
     #上述处理后，需要加上连续型变量一起进行分箱
-    if -1 not in set(testData[var1]):
-        testData[var1+'_Bin'] = testData[var1].map(lambda x: AssignBin(x, continous_merged_dict[var1]))
-    else:
-        testData[var1 + '_Bin'] = testData[var1].map(lambda x: AssignBin(x, continous_merged_dict[var1],[-1]))
+    if var1 in set(continous_merged_dict.keys()):
+        if -1 not in set(testData[var1]):
+            testData[var1+'_Bin'] = testData[var1].map(lambda x: AssignBin(x, continous_merged_dict[var1]))
+        else:
+            testData[var1 + '_Bin'] = testData[var1].map(lambda x: AssignBin(x, continous_merged_dict[var1],[-1]))
 
     #WOE编码
     var3 = var.replace('_WOE','')
@@ -123,21 +125,37 @@ for var in var_in_model:
 '''
 第四步：将WOE值代入LR模型，计算概率和分数
 '''
-testData['intercept'] = [1]*testData.shape[0]
+# testData['intercept'] = [1]*testData.shape[0]
+print('intercept --> ',LR.intercept_,' coef --> ',LR.coef_)
+# var_in_model.append('intercept')
 #预测数据集中，变量顺序需要和LR模型的变量顺序一致
 #例如在训练集里，变量在数据中的顺序是“负债比”在“借款目的”之前，对应地，在测试集里，“负债比”也要在“借款目的”之前
-testData2 = testData[list(LR.params.index)]
-testData['prob'] = LR.predict(testData2)
-
+testData2 = testData[var_in_model]
+print('var_in_model--->',var_in_model)
+print('testData2 --> ',testData2.head(),'\ntestData2.shape --> ',testData2.shape[0])
+testData['prob'] = LR.predict_proba(testData2)[:,1]
+print(testData2.head(10))
 #计算KS和AUC
 auc = roc_auc_score(testData['y'],testData['prob'])
 ks = KS(testData, 'prob', 'y')
 print('ks-->',ks,'auc-->',auc)
 rocGraph(testData['y'],testData['prob'])
-
-basePoint = 250
-PDO = 200
-testData['score'] = testData['prob'].map(lambda x:Prob2Score(x, basePoint, PDO))
+# oddso = 1/60
+oddso = 0.12474872429256224
+basePoint = 600
+PDO = 20
+B = PDO/np.log(2)
+A = basePoint + B * np.log(oddso)
+print('A->',A,' B ->',B)
+def Prob2Score(prob):
+    #将概率转化成分数且为正整数
+    y = np.log(prob/(1-prob))
+    return int(A - B * y)
+print('1/120-->',Prob2Score(1/120))
+print('1/30-->',Prob2Score(1/30))
+# basePoint = 250
+# PDO = 200
+testData['score'] = testData['prob'].map(lambda x:Prob2Score(x))
 testData = testData.sort_values(by = 'score')
 
 
