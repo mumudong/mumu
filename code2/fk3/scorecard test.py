@@ -113,7 +113,6 @@ for var in var_in_model:
         max_br = max(testData[var1])
         testData[var1] = testData[var1].map(lambda x: ModifyDf(x, max_br))
 
-
     #上述处理后，需要加上连续型变量一起进行分箱
     if var1 in set(continous_merged_dict.keys()):
         if -1 not in set(testData[var1]):
@@ -141,8 +140,8 @@ ks = KS(testData, 'prob', 'y')
 print('ks-->',ks,'auc-->',auc)
 rocGraph(testData['y'],testData['prob'])
 
-basePoint = 250
-PDO = 200
+basePoint = 600
+PDO = 20
 testData['score'] = testData['prob'].map(lambda x:Prob2Score(x, basePoint, PDO))
 testData = testData.sort_values(by = 'score')
 
