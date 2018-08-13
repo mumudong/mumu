@@ -1,11 +1,5 @@
-
-===============
-
-
 更改表名
-
 //快照 这样试试，先建立个表自己测试下，可以的话在执行。
-
 需要开启快照功能，在hbase-site.xml文件中添加如下配置项：
 <property>
 <name>hbase.snapshot.enabled</name>
@@ -18,70 +12,44 @@ hbase shell> clone_snapshot 'tableSnapshot', 'newTableName'
 hbase shell> delete_snapshot 'tableSnapshot'
 hbase shell> drop 'tableName'
 ================================
-
 balance_switch true 开启负载均衡
  开启/关闭region
 # 语法：balance_switch true|false
 hbase(main)> balance_switch
-
-
-
-
-
-
-0 row(s) in 0.0110seconds
-
-
-
-
-
 ========================
 ===============================
-
-
-
-
-
 4.2统计行数代码(Code Snippet)
-public class MyAggregationClient { 
-
-private static final byte[] TABLE_NAME = Bytes.toBytes("mytable");
-private static final byte[] CF = Bytes.toBytes("vent");
-public static void main(String[] args) throws Throwable {
-Configuration customConf = new Configuration();
-customConf.setStrings("hbase.zookeeper.quorum",
-"node0,node1,node2");
-//提高RPC通信时长
-customConf.setLong("hbase.rpc.timeout", 600000);
-//设置Scan缓存
-customConf.setLong("hbase.client.scanner.caching", 1000);
-Configuration configuration = HBaseConfiguration.create(customConf);
-AggregationClient aggregationClient = new AggregationClient(
-configuration);
-Scan scan = new Scan();
-//指定扫描列族，唯一值
-scan.addFamily(CF);
-long rowCount = aggregationClient.rowCount(TABLE_NAME, null, scan);
-System.out.println("row count is " + rowCount);
-
+public class MyAggregationClient {
+    private static final byte[] TABLE_NAME = Bytes.toBytes("mytable");
+    private static final byte[] CF = Bytes.toBytes("vent");
+    public static void main(String[] args) throws Throwable {
+    Configuration customConf = new Configuration();
+    customConf.setStrings("hbase.zookeeper.quorum",
+    "node0,node1,node2");
+    //提高RPC通信时长
+    customConf.setLong("hbase.rpc.timeout", 600000);
+    //设置Scan缓存
+    customConf.setLong("hbase.client.scanner.caching", 1000);
+    Configuration configuration = HBaseConfiguration.create(customConf);
+    AggregationClient aggregationClient = new AggregationClient(
+    configuration);
+    Scan scan = new Scan();
+    //指定扫描列族，唯一值
+    scan.addFamily(CF);
+    long rowCount = aggregationClient.rowCount(TABLE_NAME, null, scan);
+    System.out.println("row count is " + rowCount);
 }
 }
-
-
-
-
-
 =======
 =================
 4.3 典型例子
   协处理器其中的一个作用是使用Observer创建二级索引。先举个实际例子： 
   我们要查询指定店铺指定客户购买的订单，首先有一张订单详情表，它以被处理后的订单id作为rowkey；
-  其次有一张以客户nick为rowkey的索引表，结构如下： 
-
+  其次有一张以客户nick为rowkey的索引表，结构如下：
 rowkey family 
 dp_id+buy_nick1 tid1:null tid2:null ... 
 dp_id+buy_nick2 tid3:null 
-... 
+...
 该表可以通过Coprocessor来构建，实例代码： 
 [html] view plain copy 在CODE上查看代码片派生到我的代码片
 public class TestCoprocessor extends BaseRegionObserver {   
@@ -119,9 +87,9 @@ public class TestCoprocessor extends BaseRegionObserver {
 
 put操作效率不高，如上代码，每插入一条数据需要创建一个新的索引表连接（可以使用htablepool优化），向索引表插入数据。即耗时是双倍的，对hbase的集群的压力也是双倍的。当索引表有多个时，压力会更大。 
 查询效率比filter高，毫秒级别，因为都是rowkey的查询。 
-如上是估计的效率情况，需要根据实际业务场景和集群情况而定，最好做预先测试。 
-4.7Coprocessor二级索引方案优劣 
+如上是估计的效率情况，需要根据实际业务场景和集群情况而定，最好做预先测试。
 
+4.7Coprocessor二级索引方案优劣
 优点：在put压力不大、索引region均衡的情况下，查询很快。 
 缺点：业务性比较强，若有多个字段的查询，需要建立多张索引表，需要保证多张表的数据一致性，
 且在hbase的存储和内存上都会有更高的要求。
