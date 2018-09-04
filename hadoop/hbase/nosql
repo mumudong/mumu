@@ -1,3 +1,11 @@
+hbase和Kudu对比：
+   hbase写速度更快，但scan速度稍慢，olap需要较强的scan性能
+   kudu写速度稍慢，因为要先查询有没有当前key，主键可以是一列或多列。scan速度快，因为直接定位数据，不像hbase要读取memstore和storefile然后合并
+   kudu不依赖hdfs，重写了存储，使用raft协议保证副本可靠性，Kudu分basedata(input data),undo log(已处理数据),redo log(未处理数据)
+
+
+
+
 ---->redis
     Redis 通常被称为数据结构服务器，因为值（value）可以是 字符串(String), 哈希(Hash/Map), 列表(list), 集合(sets) 和
 有序集合(sorted sets)五种类型，操作非常方便。比如，如果你在做好友系统，查看自己的好友关系，如果采用其他的key-value系统，
