@@ -1,3 +1,16 @@
+hbase和Kudu对比：
+   hbase写速度更快，random access快，但scan速度稍慢，olap需要较强的scan性能。hbase在sql/mr类的批量检索场景中性能不够好。
+        通常这种场景需要预处理或cube管理
+        hdfs批量顺序读快
+        kudu介于hdfs和hbase之间，它定位OLAP和少量的OLTP工作流，如果有大量的random accesses，官方建议还是使用HBase最为合适
+   kudu写速度稍慢，因为要先查询有没有当前key，主键可以是一列或多列。scan速度快，因为直接定位数据，不像hbase要读取memstore和storefile然后合并
+   kudu不依赖hdfs，重写了存储，使用raft协议保证副本可靠性，Kudu分basedata(input data),undo log(已处理数据),redo log(未处理数据)
+
+    快速分析 impala+kudu
+    phoenix+hbase比Impala+hbase快。phoenix有索引支持。 https://www.cnblogs.com/MOBIN/p/5467284.html
+    https://www.cnblogs.com/linbingdong/p/5832112.html
+查看hive源码，use database执行了哪些操作。。。
+
 ---->redis
     Redis 通常被称为数据结构服务器，因为值（value）可以是 字符串(String), 哈希(Hash/Map), 列表(list), 集合(sets) 和
 有序集合(sorted sets)五种类型，操作非常方便。比如，如果你在做好友系统，查看自己的好友关系，如果采用其他的key-value系统，
