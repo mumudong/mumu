@@ -1,0 +1,12 @@
+--connect
+jdbc:mysql://hadoop-7:3306/test
+--username
+root
+--password
+123456
+--table
+export_from_hdfs
+--export-dir
+/test/oozie/test
+--fields-terminated-by
+','

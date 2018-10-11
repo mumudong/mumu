@@ -1,0 +1,74 @@
+ <workflow-app xmlns="uri:oozie:workflow:0.2" name="sqoop2hive2sqoop-wf">
+    <start to="sqoop-import-node"/>
+
+    <action name="sqoop-import-node">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+                <property>
+                  <name>oozie.action.sharelib.for.sqoop</name>
+                  <value>hive,hcatalog,sqoop</value>
+                </property>
+                <property>
+                   <name>oozie.libpath</name>
+                   <value>hdfs://tianxi-ha/user/oozie/share/lib/lib_20181010105931/sqoop</value>
+                 </property>
+            </configuration>
+            <command>import --connect jdbc:mysql://10.167.222.107:3306/test --username root --password 123456 --table testtt --hive-database default --hive-table import_from_mysql_testtt --hive-import --hive-overwrite --delete-target-dir</command>
+            
+        </sqoop>
+        <ok to="hive-node"/>
+        <error to="sqoop-import-fail"/>
+    </action>
+    <action name="hive-node">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <prepare>
+                <delete path="${nameNode}/user/hdfs/${examplesRoot}/${outputDir}"/>
+            </prepare>
+            <job-xml>${nameNode}/user/hdfs/${examplesRoot}/sqoop2hive2sqoop/hive-site.xml</job-xml>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <script>select.sql</script>
+        </hive>
+        <ok to="sqoop-export-node"/>
+        <error to="hive-fail"/>
+    </action>
+
+    <action name="sqoop-export-node">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <command>export --options-file sqoop-export.sql</command>
+            <file>${nameNode}/user/hdfs/${examplesRoot}/sqoop2hive2sqoop/sqoop-export.sql#sqoop-export.sql</file>
+        </sqoop>
+        <ok to="end"/>
+        <error to="sqoop-export-fail"/>
+    </action>
+    <kill name="sqoop-import-fail">
+        <message>Sqoop import failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <kill name="hive-fail">
+        <message>hive failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <kill name="sqoop-export-fail">
+        <message>Sqoop export failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

@@ -1,0 +1,5 @@
+type=command
+dependencies=1
+command=/root/retry2.sh
+retries=3
+retry.backoff=10000

@@ -1,0 +1,15 @@
+--connect
+jdbc:mysql://hadoop-7:3306/test
+--username
+root
+--password
+123456
+--table
+testtt
+--hive-database
+default
+--hive-table
+import_from_mysql_testtt
+--hive-import
+--hive-overwrite
+--delete-target-dir
