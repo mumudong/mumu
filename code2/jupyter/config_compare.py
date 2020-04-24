@@ -7,15 +7,12 @@ import csv
 reload(sys)
 
 sys.setdefaultencoding('utf8')
-# f = codecs.open("/export/user/dwetl/musd/text.txt", "w", encoding="utf-8")
-csvFile = codecs.open( '/export/user/dwetl/musd/baseCompare.csv', 'w',encoding="utf-8")
-column_csvFile = codecs.open( '/export/user/dwetl/musd/columnCompare.csv', 'w',encoding="gbk")
-base_dict_head = ['jobName','accessUser','department','systemName','databaseSource','tableName','tableNameCh','devManager',
-                 'isRunBatch','runBatch','estimateNum','accessFrequency','pumpingTimeStart','pumpingTimeEnd','accessStrategy','incrementLogic','storageStrategy','dynamicInsert','nullValidate','alarmMethod','wherecondition','alarmUser','alarmMoment','startRunTime','endRunTime','isEnableRelevance',
-                 'haveOdm',
-                 'failedExecuteNextDay','failedRetry','runOutTimeOut','jobType','startTime']
+# f = codecs.open("/export/text.txt", "w", encoding="utf-8")
+csvFile = codecs.open( '/export/baseCompare.csv', 'w',encoding="utf-8")
+column_csvFile = codecs.open( '/export/columnCompare.csv', 'w',encoding="gbk")
+base_dict_head = ['jobName','accessUser' ]
 base_dict = {}
-column_dict_head = ['jobName','field_name','field_name_ch','is_access','is_pk','is_empty','is_incre','is_security','security_type','security_code','enum_value']
+column_dict_head = ['jobName','field_name']
 column_dic = {}
 baseWriter = csv.DictWriter(csvFile,base_dict_head,extrasaction='ignore')
 baseWriter.writeheader()
@@ -61,7 +58,6 @@ def merge_dict(dict1, dict2):
 try:
     for db in dbs:
         print("id:{},域名:{} ==================================================>".format(db[0],db[1]))
-        #找到该数据库对应的所有stage作业
         dbId = db[0]
         getStageJobSql = """ 
             select  
