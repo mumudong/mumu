@@ -1,0 +1,67 @@
+
+时序数据库排行榜：https://db-engines.com/en/ranking/time+series+dbms
+
+1、opentsdb时序数据库
+    注意个别版本opentsdb和hbase需要兼容
+    安装opentsdb依赖
+    yum install automakeyum install gnuplot autoconf -y
+    rpm -ivh opentsdb的rpm包
+    修改配置文件 /usr/share/opentsdb/etc/opentsdb/opentsdb.conf 的 tsd.storage.hbase.zk_quorum值
+    设置可自动创建metrics    tsd.core.auto_create_metrics = true
+    第一次安装需要执行建表
+    cd /usr/share/opentsdb/tools
+    env COMPRESSION=NONE HBASE_HOME=/opt/bigdata/hbase-1.1.2 ./create_table.sh
+
+    启动服务
+    service opentsdb start
+    日志目录 /var/log/opentsdb
+    如果启动时报exec:java:not found,则需要在 /usr/bin/中设置java/
+
+ service grafana-server start
+
+ curl -XPOST http://mu3:4242/api/put?summary -d '{
+    "metric": "sys.cpu.nice",
+    "timestamp": 1587650745,
+    "value": 22,
+    "tags": {
+    "host": "web01",
+    "dc": "lga"
+    }}'
+
+
+2、telegraf influxdb
+# 下载安装包
+wget http://get.influxdb.org/telegraf/telegraf-0.11.1-1.x86_64.rpm
+# 解压
+sudo yum localinstall telegraf-0.11.1-1.x86_64.rpm
+service telegraf start
+vim /etc/telegraf/telegraf.conf
+[[outputs.influxdb]]
+   urls = ["http://localhost:8086"] # required
+   database = "telegraf" # required
+   retention_policy = ""
+   precision = "s"
+   timeout = "5s"
+   username = "telegraf"
+   password = "password"
+
+[root@localhost~]# influx
+> create user "telegraf" with password 'password'
+> show users;
+> create database telegraf
+> show databases
+service restart influxdb
+
+telegraf.conf
+[[inputs.cpu]]
+  interval = “60s”
+  percpu = true
+  totalcpu = true
+  fielddrop = [“time*”]
+
+[[inputs.file]]
+  files = ["/var/log/apache/access.log"]
+  data_format = "influx"
+
+telegraf -sample-config -input-filter cpu:mem -output-filter opentsdb > telegraf.conf
+启动 telegraf --config telegraf.conf
