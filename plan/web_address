@@ -1,3 +1,6 @@
+calcite解析sql的简单使用方式，我们可以使用Calcite来做血缘分析
+
+
 tensorflow ----》 http://www.tensorfly.cn/tfdoc/get_started/os_setup.html
 tensorflow看看 ----》 https://www.cnblogs.com/wangxiaocvpr/p/5902086.html
 tensorflow中文社区 ----》 http://www.tensorfly.cn/tfdoc/get_started/basic_usage.html ,目标定位，计算距离，滑动验证码
