@@ -1,3 +1,10 @@
+spring security 的核心是基于filter
+入口filter是springSecurityFilterChain(它会被DelegatingFilterProxy委托来执行过滤任务)
+springSecurityFilterChain实际上是FilterChainProxy （一个filter）
+FilterChainProxy里边有一个SecurityFilterChain集合，doFIlter的时候会从其中取。
+
+
+
 @RequiresAuthentication
 验证用户是否登录，等同于方法subject.isAuthenticated() 结果为true时。
 @RequiresUser
