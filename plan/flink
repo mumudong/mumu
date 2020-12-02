@@ -1,0 +1,6 @@
+flink metrics监控
+    1: webui
+    2: http (和webuile类似) 不可查看历史,不可分析
+    3: 第三方metrics reporter(作业很多时推荐)
+
+
